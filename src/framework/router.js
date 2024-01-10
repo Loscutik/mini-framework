@@ -11,7 +11,7 @@ class Router {
         params += queries;
       }
     }
-    window.history.pushState("", "", `/${path}${params}`);
+    window.history.pushState({}, "", `/${path}${params}`);
     //window.location.href = `/${path}${params}`;
   }
 }

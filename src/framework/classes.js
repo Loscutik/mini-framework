@@ -67,9 +67,10 @@ export class ChrisFramework {
    * @param {Element} DOMElement  the mountable DOM object
    * @param {string} targetString the id of the element in the document to mount the DOM into (usually 'app')
    */
-  mount(DOMElement, targetString) {
+  mount(targetString) {
+    const app = this.render()
     const target = document.getElementById(targetString);
-    target.replaceWith(DOMElement);
+    target.replaceWith(app);
   }
 
   //#State Management

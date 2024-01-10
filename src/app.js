@@ -1,12 +1,10 @@
 import { ChrisFramework } from "./framework/classes.js"
 import { launchPage } from "./todoApp/main.js";
 
-export const vApp = new ChrisFramework()
+export let vApp = new ChrisFramework()
 
-//vApp.use(router) // creater a router function
-
-const app = vApp.render();
-
-vApp.mount(app, "app")
+vApp.mount("app")
 
 launchPage()
+
+// have it listen for events and on an event, compare new dom to old, replace changed elements and replace old app with new app
