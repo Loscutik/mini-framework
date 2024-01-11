@@ -3,9 +3,7 @@
 import { vApp } from "../app";
 import { ChrisFramework } from "./classes";
 
-// create new vApp
-
-// then compare the old vApp to the new vApp
+// compare the old vApp to the new vApp
 
 // then replace the old vApp with the new vApp
 
@@ -98,7 +96,7 @@ function patch() {
 
 }
 
-function placeholderEventFunc() {
+function placeholderDOMModifyFunction() {
     const vNewApp = new ChrisFramework()
     const patch = diff(vApp, vNewApp)
     const rootElem = vApp.render()

@@ -1,4 +1,4 @@
-import { ChrisFramework } from "./framework/classes.js"
+import { ChrisFramework } from "../framework/classes.js"
 import { launchPage } from "./todoApp/main.js";
 import { router } from "./todoApp/routes.js";
 

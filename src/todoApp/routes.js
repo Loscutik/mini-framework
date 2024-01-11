@@ -1,4 +1,4 @@
-import createRouter from "../framework/router.js";
+import createRouter from "../../framework/router.js";
 
 const routes = [
   {
