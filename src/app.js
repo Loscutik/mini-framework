@@ -5,7 +5,7 @@ import { launchPage } from "./todoApp/main.js";
 export let vApp = new ChrisFramework()
 
 
-//launchPage();
+launchPage();
 
 vApp.use(router, "router")
 
