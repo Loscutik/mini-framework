@@ -1,5 +1,3 @@
-import router from "../framework/router.js";
-
 
 export const appInnerHTML = `<section class="todoapp">
         <header class="header">
