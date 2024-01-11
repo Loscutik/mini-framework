@@ -28,13 +28,17 @@ class Router {
    * @param {[{route: string, callback: function}]} routes 
    */
   addRoutes(routes) {
-    for (const route in routes) {
-      console.log(route)
+    for (const route of routes) {
       this.addRoute(route.route, route.callback)
     }
   }
 }
 
-const router = new Router()
+function createRouter(routes) {
+  const router = new Router()
+  router.addRoutes(routes)
+  return router
+}
 
-export default router
+
+export default createRouter
