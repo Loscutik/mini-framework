@@ -5,7 +5,14 @@ class Router {
 
   //#Abstracting the DOM Routing System
 
-  routeTo(path, queries) {
+  /** queries is a string of any type of query after the path, such as 'q=URLUtils.searchParams&topic=api'
+   *
+   * can also pass as an object:  {q: 'URLUtils.searchParams', topic: 'api'}
+   *
+   * @param {string|object=} queries
+   * @param {string} path
+   */
+  routeTo(path, queries) { // pointless?
     const params = "";
     if (queries != undefined) {
       params += "/";
@@ -48,7 +55,7 @@ class Router {
     if (routeResolved) {
       routeResolved();
     } else {
-      alert("Route not defined!")
+      alert("Route not defined!");
     }
   };
 }

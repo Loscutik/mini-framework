@@ -59,14 +59,6 @@ export class ChrisFramework {
     return elem;
   }
 
-  /** queries is a string of any type of query after the path, such as 'q=URLUtils.searchParams&topic=api'
-   *
-   * can also pass as an object:  {q: 'URLUtils.searchParams', topic: 'api'}
-   *
-   * @param {string|object=} queries
-   * @param {string} path
-   */
-  
   getState() {
     return { ...this.state };
   }
@@ -107,13 +99,13 @@ export class vElement {
     this.tag = tag;
     this.attrs = attrs ? attrs : {}; // if not defined, will return empty obj
     this.children = children ? children : []; // if not defined, will return empty arr
-    this.event;
+    this.events = {}
   }
   addChildNode(node) {
     this.children.push(node);
   }
   createEvent(name) {
-    return new Event(name);
+    this.events[name] = new Event(name);
   }
   listen(name, condition, callback) {
     let previousValue = condition(null);
