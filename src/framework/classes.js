@@ -6,6 +6,7 @@ export class ChrisFramework {
   use(dependency, dependencyName) {
     this.dependencies[dependencyName] = dependency;
   }
+  
 
   /** tag is for the type of element, for example tag='div' === <div>
    *
