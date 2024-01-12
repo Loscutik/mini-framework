@@ -1,3 +1,4 @@
+import { filters } from "../src/todoApp/models/filter_model.js";
 
 class Router {
   constructor() {
@@ -51,10 +52,9 @@ class Router {
   };
   router = (event) => {
     const url = window.location.hash.slice(1) || "/";
-
-    const routeResolved = this.resolveRoute(url);
+    const routeResolved = this.resolveRoute(url); // checks if the route exists
     if (routeResolved) {
-      routeResolved();
+      routeResolved(); // here we resolve the route
     } else {
       alert("Route not defined!");
     }

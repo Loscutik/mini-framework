@@ -1,3 +1,4 @@
-import TodoList from "./models/todo_model";
 
-const todos = new TodoList
+export const FILTER_COMPLETED = "completed",
+  FILTER_ACTIVE = "active",
+  FILTER_ALL = "all";
