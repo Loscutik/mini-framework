@@ -1,3 +1,4 @@
+
 class Router {
   constructor() {
     this.routes = {};
@@ -67,17 +68,17 @@ class Router {
 function createRouter(routes) {
   const router = new Router()
   
+  router.addRoutes(routes);
+
   window.addEventListener("load", router.router);
   window.addEventListener("hashchange", router.router);
 
-  router.addRoutes(routes)
+  
   return router
 }
 
 
 export default createRouter
-
-
 
 
 // materials to work through

@@ -1,11 +1,11 @@
 import { vApp } from "../app.js"
 import { vElement } from "../../framework/classes.js"
-import { appInnerHTML } from "./consts.js"
+import { mainPageInnerHTML } from "./templates/mainPage.js"
 
 export function launchPage() {
     const body = document.createElement("div")
-    body.innerHTML = appInnerHTML
-    const vNewElem = new vElement("div", {}, appInnerHTML)
+    body.innerHTML = mainPageInnerHTML
+    const vNewElem = new vElement("div", {}, mainPageInnerHTML)
     vApp.state.addChildNode(vNewElem)
     vApp.mount("app", vApp.state)
 }

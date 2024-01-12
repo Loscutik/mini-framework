@@ -4,13 +4,6 @@ Many variables here are written with v in the name. The v stands for virtual, as
 This is to not confuse the actual HTML DOM elements and their object representations.
 
 
-when en event is triggered, it should be modified in the virtual DOM
-don't need any more event handling than routing atm
-
-# when a state is changed, how should it modify the vDOM? like how does it know which elements to modify etc
-
-
-basically the routes load different states
 
 
 

@@ -3,7 +3,7 @@ export class ChrisFramework {
     this.state = this.new();
     this.dependencies = {}
   }
-  use(dependency, dependencyName) {
+  use(dependency, dependencyName) { // pointless?
     this.dependencies[dependencyName] = dependency;
   }
   
@@ -25,7 +25,7 @@ export class ChrisFramework {
   new() {
     return new vElement("div", { id: "app" }, []);
   }
-  /**renders the initial virtual DOM into the actual DOM
+  /**renders the initial virtual DOM into an actual DOM Element
    */
   render() {
     const elem = document.createElement(this.state.tag);
