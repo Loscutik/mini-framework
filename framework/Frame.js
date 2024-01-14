@@ -14,8 +14,21 @@ class Frame {
      * @param {string[]} events - list of events
      * 
       */
-    useEvents(events){
-        this._DOMevents=events
+    useEvents(events) {
+        this._DOMevents = events;
+
+        this._DOMeventsListener = ($elem) => { // this func is called in the mount method
+            this._DOMevents.forEach((DOMevent) => {
+                $elem.addEventListener(DOMevent, ($event) => { // native listener will stop propagation and default behavior, and emit the corresponding event for the corresponding virtual Element
+                    $event.stopPropagation();
+                    $event.preventDefault();
+                    vElemUuid = $event.target.getAttribute('vID');
+                    this._state.getChild(vElemUuid)?.emit(`@${DOMevent}`); // suppose all event in virtual elements have names started with @
+                });
+
+            }
+            );
+        }
     }
 
 
@@ -30,11 +43,8 @@ class Frame {
     createElement({ tag = "", attrs = {}, content = "", children = [] }) {
         vElem = new VElement({ tag, attrs, content, children });
         this._state.addChild(vElem);
-        
+
     }
-
-    
-
 
     /**renders the initial virtual DOM into an actual DOM Element
      */
@@ -50,6 +60,8 @@ class Frame {
      * @param {Element} $elem the id of the element in the document to mount the DOM into (usually 'app')
      */
     mount($elem) {
-        return this._state.mount($elem).$elem
+        $elem = this._state.mount($elem).$elem;
+        this._DOMeventsListener($elem);
+        return $elem;
     }
 }

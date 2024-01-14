@@ -7,17 +7,23 @@ export class VElement {
      * 
      * @param {Object} options  
      * @param {string=} options.tag  - ex. 'div', 'span' etc
-     * @param {{}=} options.attrs - ex. `{id: 'container'}`
+     * @param {{}=} options.attrs - ex. `{id: 'container'}` , attribute vID is reserved for internal use only (keep id of the corresponding vElement)
      * @param {string= } options.content  - plain text or html
      * @param {VElement[]=} options.children  can add children recursively by making new Elements in the children
      */
     constructor({ tag = "", attrs = {}, content = "", children = [] }) {
+        this._vId = crypto.randomUUID();
+
+        preparedChildren = children.reduce((acc, child) =>{
+            acc.push([child._vId, child])
+        },[]);
+
         this.state = new Proxy(
             {
                 tag: tag,
                 attrs: attrs,
                 content: content,
-                children: children,
+                children: new Map(preparedChildren),
             },
             {
                 get: (stateObj, key) => { return stateObj[key] },
@@ -56,6 +62,14 @@ export class VElement {
         );
         this.events = {}
     }
+    get vId() {
+        return this._vId;
+    }
+
+    getChild(vID){
+        return this.state.children.get(vID);
+    }
+
     render() {
         if (this.state.tag === undefined || this.state.tag == '') {
             return document.createTextNode(this.state.content);
@@ -77,6 +91,7 @@ export class VElement {
         }
 
         this.$elem = $elem;
+        this.$elem.setAttribute('vID', this.state.uuid);
         return this;
     }
 
@@ -116,11 +131,15 @@ export class VElement {
 
         return this
     }
-    on(event, callback) { 
-        if (!this.events[event]) {
-            this.events[event] = [];
+
+    on(eventType, callback) { 
+        if (!eventType.startsWith("@")) {
+            return
         }
-        this.events[event].push(callback);
+        if (!this.events[eventType]) {
+            this.events[eventType] = [];
+        }
+        this.events[eventType].push(callback);
     }
     emit(event){
         this.events[event].forEach((callback) => callback());
