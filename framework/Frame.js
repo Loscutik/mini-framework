@@ -11,10 +11,10 @@ class Frame {
         this.dependencies[dependencyName] = dependency;
     }
     /** list of events fired on the DOM elements that the frame will be able to handle
-     * @param {string[]} events - list of events
+     * @param {string} events - list of events
      * 
       */
-    useEvents(events) {
+    useEvents(...events) {
         this._DOMevents = events;
 
         this._DOMeventsListener = ($elem) => { // this func is called in the mount method
