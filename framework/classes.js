@@ -86,38 +86,7 @@ export class ChrisFramework {
   //#Event Handling
 }
 
-export class vElement {
-  /**create an element with the tag, attributes and possible children at once
-   *
-   *
-   *
-   * @param {string} tag ex. 'div', 'span' etc
-   * @param {{}=} attrs ex. {id='container'}
-   * @param {=} children  can add children recursively by making new Elements in the children
-   */
-  constructor(tag, attrs, children) {
-    this.tag = tag;
-    this.attrs = attrs ? attrs : {}; // if not defined, will return empty obj
-    this.children = children ? children : []; // if not defined, will return empty arr
-    this.events = {}
-  }
-  addChildNode(node) {
-    this.children.push(node);
-  }
-  createEvent(name) {
-    this.events[name] = new Event(name);
-  }
-  listen(name, condition, callback) {
-    let previousValue = condition(null);
-    this.addEventListener(name, (e) => {
-      const currentValue = condition(e);
-      if (previousValue !== currentValue) {
-        previousValue = currentValue;
-        callback(e);
-      }
-    });
-  }
-}
+
 
 // add router functionality with window.pushState()
 

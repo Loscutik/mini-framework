@@ -1,7 +1,8 @@
 // on event
 
-import { vApp } from "../app";
-import { ChrisFramework } from "./classes";
+// import { vApp } from "../app"; //  we must not use app in framwork, but use framework in app (like vue doesn't know about our app)
+import { ChrisFramework } from "./classes.js";
+import render  from "./render.js"
 
 // compare the old vApp to the new vApp
 
@@ -15,31 +16,32 @@ import { ChrisFramework } from "./classes";
  * @param {{}} oldAttrs 
  * @param {{}} newAttrs 
  */
-function diffAttrs(oldAttrs, newAttrs) {
+export function diffAttrs(oldAttrs, newAttrs) {
     const patches = []
 
     // set new attributes for elem
     for (const [k, v] of Object.entries(newAttrs)) {
-        patches.push(n => {
-            n.setAttribute(k, v)
-            return n
+        patches.push($node => {
+            $node.setAttribute(k, v)
+            return $node;
         })
     }
 
     // delete old attributes
     for (const [k, v] of Object.entries(oldAttrs)) {
         if (!(k in newAttrs)) {
-            patches.push(n => {
-                n.removeAttributes(k)
-                return n
+            patches.push($node => {
+                $node.removeAttributes(k)
+                return $node;
             })
         }
     }
 
-    return n => {
+    return $node => {
         for (const patch of patches) {
-            patch(n)
+            patch($node)
         }
+        return $node;
     }
 }
 
@@ -48,11 +50,31 @@ function diffAttrs(oldAttrs, newAttrs) {
  * @param {[]} oldVChildren 
  * @param {[]} newVChildren 
  */
-function diffChildren(oldVChildren, newVChildren) {
-    const childPatches = []
-  for (const oldVChild of oldVChildren) {
+export function diffChildren(oldVChildren, newVChildren) {
+    const childrenPatches = [];
+    oldVChildren.forEach((oldVChild, i) => {
+        childrenPatches.push(diff(oldVChild, newVChildren[i]));
+    });
 
-  }
+    const additionalPatches = [];
+    for (const additionalVChild of newVChildren.slice(oldVChildren.length)) {
+        additionalPatches.push($node => {
+            $node.appendChild(additionalVChild.render().$elem);
+            return $node;
+        });
+    }
+
+    return $parent => {
+
+        $parent.childNodes.forEach(($child, i) => {
+            childrenPatches[i]($child);
+        });
+
+        for (const patch of additionalPatches) {
+            patch($parent);
+        }
+        return $parent;
+    };
 }
 /**
  * 
@@ -61,34 +83,41 @@ function diffChildren(oldVChildren, newVChildren) {
  */
 function diff(vOldNode, vNewNode) {
     if (vNewNode.state === undefined) {
-        return n => {
-            n.remove();
+        return $n => {
+            $n.remove();
             return undefined
         }
     }
-    if (vOldNode.state.tag !== vNewNode.state.tag) {
-        return n => {
-            const replaced = vNewNode.render()
-            return replaced
-        }
-    }
-    if (typeof vOldNode.state === "string" || typeof vNewNode==="string") {
-        if (vOldNode.state!==vNewNode.state) {
-            return n => {
-                const newNode = vNewNode.render()
-                n.replaceWith(newNode)
+
+    if (typeof vOldNode === "string" || typeof vNewNode === "string") {
+        if (vOldNode !== vNewNode) {
+            return $n => {
+                const newNode = render(vNewNode) 
+                $n.replaceWith(newNode)
                 return newNode
             }
         } else {
-            return n => undefined
+            // vOldNode and vNewNode are the same string
+            return $n => $n
         }
     }
-    const patchArrs = diffAttrs(vOldNode.state.attrs, vNewNode.state.attrs)
 
+    if (vOldNode.state.tag !== vNewNode.state.tag) {
+        return $n => {
+            const $newNode = vNewNode.render().$elem;
+            $n.replaceWith($newNode);
+            return $n;
+        }
+    }
+
+    const patchArrs = diffAttrs(vOldNode.state.attrs, vNewNode.state.attrs);
     const patchChildren = diffAttrs(vOldNode.state.children, vNewNode.state.children);
 
-    return n => {
-        patchArrs(n)
+    return $n => {
+        patchArrs($n);
+        patchChildren($n);
+        return $n;
+
     }
 }
 
