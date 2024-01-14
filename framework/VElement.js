@@ -67,7 +67,7 @@ export class VElement {
             $elem.setAttribute(k, v);
         }
 
-        if ((this.state.content === undefined || this.state.content == '') && this.state.children.lenght > 0) {
+        if (this.state.content === undefined || this.state.content == '')  {
             $elem.innerHTML = this.state.content;
             return $elem;
         }
@@ -98,7 +98,9 @@ export class VElement {
     //TODO
     addClass(className) {
     }
-
+/** adds a virtual element as a child  of this virtual element.
+ * If this element is mounted, it will render the virtual child and mount as a child of real DOM element
+*/
     addChild(vNode) {
         if (typeof vNode === 'string') {
             vNode = new VElement({ content: vNode })
@@ -106,8 +108,8 @@ export class VElement {
 
         if (vNode instanceof VElement) {
             this.state.children.push(vNode);
-            const $node = vNode.render()
             if (this.$elem) {
+                const $node = vNode.render()
                 this.$elem.appendChild($node);
             }
         }

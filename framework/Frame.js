@@ -2,17 +2,28 @@ import { VElement } from "./VElement";
 class Frame {
     constructor() {
         this._state = new VElement({ tag: "div", attrs: { id: "app" } });
-        this.dependencies = {}
+        this._DOMevents = [];
+        //TODO ?  pointless? -  this.dependencies = {}
+
     }
 
     use(dependency, dependencyName) { // pointless?
         this.dependencies[dependencyName] = dependency;
     }
+    /** list of events fired on the DOM elements that the frame will be able to handle
+     * @param {string[]} events - list of events
+     * 
+      */
+    useEvents(events){
+        this._DOMevents=events
+    }
 
 
-    /** tag is for the type of element, for example tag='div' === <div>
+    /**creates virtual Element as a child of the frame.
+     * tag is for the type of element, for example tag='div' === <div>
      *
      * attrs are for attributes, like style: { margin: 5px }
+     * content is a string that will be inserted as innerHTML before all its children.
      *
      * uu
      */
