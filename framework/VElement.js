@@ -170,8 +170,8 @@ console.log(`vID: ${this._vId} tag: ${tag}, content: ${content}`)
         this.events[eventType].push(callback);
     }
 
-    emit(event){
-        this.events[event].forEach((callback) => callback());
+    emit(eventType){
+        this.events[eventType].forEach((callback) => callback());
     } 
 
 
