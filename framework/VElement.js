@@ -60,7 +60,18 @@ export class VElement {
                 }
             }
         );
-        this.events = {}
+        this.events = new Proxy({},
+            {
+               set: (target, eventType, callback)=>{
+                if (!eventType.startsWith("@")) {
+                    return
+                }
+                if (!target[eventType]) {
+                    target[eventType] = [];
+                }
+                target[eventType].push(callback);
+               }
+            });
     }
     get vId() {
         return this._vId;
@@ -141,6 +152,7 @@ export class VElement {
         }
         this.events[eventType].push(callback);
     }
+    
     emit(event){
         this.events[event].forEach((callback) => callback());
     } 
