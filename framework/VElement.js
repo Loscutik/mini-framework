@@ -51,7 +51,10 @@ console.log(`vID: ${this._vId} tag: ${tag}, content: ${content}`)
                     // works if we assighn a new array as children
                     if (key === 'children') {
                         const oldChildren = stateObj.children;
-                        stateObj.children = value;
+                        const preparedChildren = children.reduce((acc, child) =>{
+                            acc.push([child._vId, child])
+                        },[]);
+                        stateObj.children = new Map(preparedChildren);
                         patch = diffChildren(oldChildren, stateObj.children);
                         this.$elem = patch(this.$elem);
                     }
@@ -147,6 +150,14 @@ console.log(`vID: ${this._vId} tag: ${tag}, content: ${content}`)
         }
 
         return this
+    }
+
+    delChild(vId){
+        this.state.children.delete(vId);
+    }
+
+    delAttribute(key){
+        this.state.attrs.delete(key);
     }
 
     on(eventType, callback) { 
