@@ -1,4 +1,4 @@
-import { VElement } from "./VElement";
+import { VElement } from "./VElement.js";
  /**render virtual Node or string to the DOM 
      *
      *

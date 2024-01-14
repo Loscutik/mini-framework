@@ -14,10 +14,10 @@ export class VElement {
     constructor({ tag = "", attrs = {}, content = "", children = [] }) {
         this._vId = crypto.randomUUID();
 
-        preparedChildren = children.reduce((acc, child) =>{
+        const preparedChildren = children.reduce((acc, child) =>{
             acc.push([child._vId, child])
         },[]);
-
+console.log(`vID: ${this._vId} tag: ${tag}, content: ${content}`)
         this.state = new Proxy(
             {
                 tag: tag,
@@ -77,37 +77,43 @@ export class VElement {
         return this._vId;
     }
 
-    getChild(vID){
-        return this.state.children.get(vID);
+    getChild(vId){
+        return this.state.children.get(vId);
     }
 
     render() {
+        console.log(`start render: `,this);
+        
         if (this.state.tag === undefined || this.state.tag == '') {
             return document.createTextNode(this.state.content);
         }
-
+        
         const $elem = document.createElement(this.state.tag);
 
         for (const [k, v] of Object.entries(this.state.attrs)) {
             $elem.setAttribute(k, v);
         }
 
-        if (this.state.content === undefined || this.state.content == '')  {
+        console.log(`render: content is ${this.state.content}`);
+        if (this.state.content !== undefined && this.state.content !== '')  {
+            console.log(`render: content is ${this.state.content}`);
             $elem.innerHTML = this.state.content;
-            return $elem;
         }
 
-        for (const child of this.state.children) {
-            $elem.appendChild(child.render());
-        }
+        this.state.children.forEach((child) => {$elem.appendChild(child.render().$elem);  console.log(`render: child - `,child);});
 
         this.$elem = $elem;
-        this.$elem.setAttribute('vID', this.state.uuid);
+        console.log(`render: this is ${this.vId}, this.$elem`,this.$elem);
+
+        this.$elem.setAttribute('vId', this.vId);
         return this;
     }
 
     mount($elem) {
+        console.log(`mounting: this is :${this.state.tag}, ${this.$elem}`, this);
+        console.log(`mounting: $elem`, $elem);
         $elem.replaceWith(this.render().$elem);
+        console.log(`mounting: this is :${this.state.tag}, ${this.$elem}`, this);
         return this;
     }
 
@@ -133,7 +139,7 @@ export class VElement {
         }
 
         if (vNode instanceof VElement) {
-            this.state.children.push(vNode);
+            this.state.children.set(vNode._vId, vNode);
             if (this.$elem) {
                 const $node = vNode.render()
                 this.$elem.appendChild($node);
@@ -152,7 +158,7 @@ export class VElement {
         }
         this.events[eventType].push(callback);
     }
-    
+
     emit(event){
         this.events[event].forEach((callback) => callback());
     } 

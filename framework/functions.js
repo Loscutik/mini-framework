@@ -2,7 +2,7 @@
 
 // import { vApp } from "../app"; //  we must not use app in framwork, but use framework in app (like vue doesn't know about our app)
 import { ChrisFramework } from "./classes.js";
-import render  from "./render.js"
+import render from "./render.js"
 
 // compare the old vApp to the new vApp
 
@@ -52,29 +52,31 @@ export function diffAttrs(oldAttrs, newAttrs) {
  */
 export function diffChildren(oldVChildren, newVChildren) {
     const childrenPatches = [];
-    oldVChildren.forEach((oldVChild, i) => {
-        childrenPatches.push(diff(oldVChild, newVChildren[i]));
+    oldVChildren.forEach((oldVChild, vId) => {
+        childrenPatches.push(diff(oldVChild, newVChildren.get(vId)));
     });
 
     const additionalPatches = [];
-    for (const additionalVChild of newVChildren.slice(oldVChildren.length)) {
-        additionalPatches.push($node => {
-            $node.appendChild(additionalVChild.render().$elem);
-            return $node;
-        });
-    }
-
-    return $parent => {
-
-        $parent.childNodes.forEach(($child, i) => {
-            childrenPatches[i]($child);
-        });
-
-        for (const patch of additionalPatches) {
-            patch($parent);
+    newVChildren.forEach(newVChild => {
+        if (!oldVChildren.has(newVChild.vID)) {
+            additionalPatches.push($node => {
+                $node.appendChild(newVChild.render().$elem);
+                return $node;
+            });
         }
-        return $parent;
-    };
+    });
+
+return $parent => {
+
+    $parent.childNodes.forEach(($child, i) => {
+        childrenPatches[i]($child);
+    });
+
+    for (const patch of additionalPatches) {
+        patch($parent);
+    }
+    return $parent;
+};
 }
 /**
  * 
@@ -92,7 +94,7 @@ function diff(vOldNode, vNewNode) {
     if (typeof vOldNode === "string" || typeof vNewNode === "string") {
         if (vOldNode !== vNewNode) {
             return $n => {
-                const newNode = render(vNewNode) 
+                const newNode = render(vNewNode)
                 $n.replaceWith(newNode)
                 return newNode
             }

@@ -1,6 +1,7 @@
-import { VElement } from "./VElement";
-class Frame {
+import { VElement } from "./VElement.js";
+export class Frame {
     constructor() {
+        console.log("Frame");
         this._state = new VElement({ tag: "div", attrs: { id: "app" } });
         this._DOMevents = [];
         //TODO ?  pointless? -  this.dependencies = {}
@@ -41,9 +42,15 @@ class Frame {
      * uu
      */
     createElement({ tag = "", attrs = {}, content = "", children = [] }) {
-        vElem = new VElement({ tag, attrs, content, children });
+        const vElem = new VElement({ tag, attrs, content, children });
         this._state.addChild(vElem);
-
+    }
+    /**addes given virtual Element as a child to the frame.
+     *
+     * uu
+     */
+    addVElement(vElem) {
+        this._state.addChild(vElem);
     }
 
     /**renders the initial virtual DOM into an actual DOM Element
@@ -61,6 +68,7 @@ class Frame {
      */
     mount($elem) {
         $elem = this._state.mount($elem).$elem;
+        console.log(`frame is mounted to element`, $elem);
         this._DOMeventsListener($elem);
         return $elem;
     }
