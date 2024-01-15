@@ -1,7 +1,6 @@
 // on event
 
 // import { vApp } from "../app"; //  we must not use app in framwork, but use framework in app (like vue doesn't know about our app)
-import { ChrisFramework } from "./classes.js";
 import render from "./render.js"
 
 // compare the old vApp to the new vApp
@@ -47,41 +46,62 @@ export function diffAttrs(oldAttrs, newAttrs) {
 
 /**
  * 
- * @param {[]} oldVChildren 
- * @param {[]} newVChildren 
+ * @param {Map.<vElement.vId, vElement>} oldVChildren 
+ * @param {Map.<vElement.vId, vElement>} newVChildren 
  */
 export function diffChildren(oldVChildren, newVChildren) {
-    const childrenPatches = [];
-    oldVChildren.forEach((oldVChild, vId) => {
-        childrenPatches.push(diff(oldVChild, newVChildren.get(vId)));
-    });
+    if (oldVChildren == null && newVChildren == null) {
+        return () => { }
+    }
 
+    if (newVChildren == null) {
+        return () => {
+            oldVChildren.clear();
+        }
+    }
+
+    // from this momemt newChilden is not null or undefined
+    const childrenPatches = [];
     const additionalPatches = [];
-    newVChildren.forEach(newVChild => {
-        if (!oldVChildren.has(newVChild.vID)) {
+
+    if (oldVChildren == null) {
+        newVChildren.forEach(newVChild => {
             additionalPatches.push($node => {
                 $node.appendChild(newVChild.render().$elem);
                 return $node;
             });
-        }
-    });
+        });
+    } else { // oldVChildren also != null
+        oldVChildren.forEach((oldVChild, vId) => {
+            childrenPatches.push(diff(oldVChild, newVChildren.get(vId)));
+        });
 
-return $parent => {
-
-    $parent.childNodes.forEach(($child, i) => {
-        childrenPatches[i]($child);
-    });
-
-    for (const patch of additionalPatches) {
-        patch($parent);
+        newVChildren.forEach(newVChild => {
+            if (!oldVChildren.has(newVChild.vID)) {
+                additionalPatches.push($node => {
+                    $node.appendChild(newVChild.render().$elem);
+                    return $node;
+                });
+            }
+        });
     }
-    return $parent;
-};
+    
+    return $parent => {
+
+        $parent.childNodes.forEach(($child, i) => {
+            childrenPatches[i]($child);
+        });
+
+        for (const patch of additionalPatches) {
+            patch($parent);
+        }
+        return $parent;
+    };
 }
 /**
  * 
- * @param {ChrisFramework} vOldNode 
- * @param {ChrisFramework} vNewNode 
+ * @param {VElement} vOldNode 
+ * @param {VElement} vNewNode 
  */
 function diff(vOldNode, vNewNode) {
     if (vNewNode.state === undefined) {
@@ -121,15 +141,4 @@ function diff(vOldNode, vNewNode) {
         return $n;
 
     }
-}
-
-function patch() {
-
-}
-
-function placeholderDOMModifyFunction() {
-    const vNewApp = new ChrisFramework()
-    const patch = diff(vApp, vNewApp)
-    const rootElem = vApp.render()
-    rootElem = patch(rootElem) // rootelem is the new DOM object of #app
 }

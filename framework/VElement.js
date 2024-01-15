@@ -46,7 +46,7 @@ export class VElement {
 
         const preparedChildren = prepareChildren(vElemObj.children)
 
-        console.log(`vID: ${this._vId} tag: ${tag}, content: ${content}`)
+        console.log(`vID: ${this._vId} tag: ${vElemObj.tag}, content: ${vElemObj.content}`)
         this.state = new Proxy(
             {
                 tag: vElemObj.tag,
@@ -56,15 +56,14 @@ export class VElement {
             },
             {
                 get: (stateObj, key) => {
-                    if (key === 'children') {
-                        return stateObj.children.keys();
-                    }
                     return stateObj[key]
                 },
                 /** allows to set properties tag, arggs, content, children. Any other will be ignored. value for children property is VElement[], which will be converted to Map
                  * 
                  */
                 set: (stateObj, key, value) => {
+                    console.log(`in VElement.state Proxy setter: params are: `, stateObj, key, value);
+
                     if (value === undefined ||
                         value === null ||
                         key === undefined ||
@@ -95,8 +94,10 @@ export class VElement {
                         const oldChildren = stateObj.children;
                         const preparedChildren = prepareChildren(value)
                         stateObj.children = new Map(preparedChildren);
-                        patch = diffChildren(oldChildren, stateObj.children);
-                        this.$elem = patch(this.$elem);
+                        if (this.$elem) {
+                            const patch = diffChildren(oldChildren, stateObj.children);
+                            this.$elem = patch(this.$elem);
+                        }
                     }
 
                     return stateObj[key]
@@ -135,7 +136,7 @@ export class VElement {
         return this.state.content;
     }
     get children() {
-        return this.state.children;
+        return this.state.children.keys();
     }
     get events() {
         return this._events.keys()
@@ -179,13 +180,14 @@ export class VElement {
             $elem.setAttribute(k, v);
         }
 
-        console.log(`render: content is ${this.state.content}`);
         if (this.state.content !== undefined && this.state.content !== '') {
             console.log(`render: content is ${this.state.content}`);
             $elem.innerHTML = this.state.content;
         }
 
-        this.state.children.forEach((child) => { $elem.appendChild(child.render().$elem); console.log(`render: child - `, child); });
+        if (this.state.children) {
+            this.state.children.forEach((child) => { $elem.appendChild(child.render().$elem); console.log(`render: child - `, child); });
+        }
 
         this.$elem = $elem;
         console.log(`render: this is ${this.vId}, this.$elem`, this.$elem);
@@ -248,8 +250,14 @@ export class VElement {
             vNode = new VElement({ content: vNode })
         }
 
+        // checks for null and undefined
+        if (this.state.children == null) {
+            this.state.children = new Map();
+        }
+
         if (vNode instanceof VElement) {
-            this.state.children.set(vNode._vId, vNode);
+            console.log('Adding child:  state.children  ', this.state.children)
+            this.state.children.set(vNode.vId, vNode);
             if (this.$elem) {
                 const $node = vNode.render()
                 this.$elem.appendChild($node);
@@ -325,8 +333,8 @@ export class VElement {
  * @returns {Array.<string,VElement>| undefined} 
  */
 function prepareChildren(children) {
-    const preparedChildren = undefined;
-
+    let preparedChildren = undefined;
+    console.log("in prepareChildren: ", children);
     if (isIterable(children)) {
         preparedChildren = [];
         for (child of children) {

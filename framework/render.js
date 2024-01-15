@@ -1,4 +1,3 @@
-// TODO del useless?
 import { VElement } from "./VElement.js";
  /**render virtual Node or string to the DOM 
      *
