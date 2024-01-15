@@ -58,7 +58,7 @@ export class Frame {
                 $elem.addEventListener(DOMevent, ($event) => { // native listener will stop propagation and default behavior, and emit the corresponding event for the corresponding virtual Element
                     $event.stopPropagation();
                     $event.preventDefault();
-                    vElemUuid = $event.target.getAttribute('vID');
+                    const vElemUuid = $event.target.getAttribute('vID');
                     this._state.getChild(vElemUuid)?.emit(`@${DOMevent}`); // suppose all event in virtual elements have names started with @
                 });
 

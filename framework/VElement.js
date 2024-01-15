@@ -122,7 +122,7 @@ export class VElement {
 
         this._events = new Proxy({},
             {
-                get: (target, eventType) => { return eventType },
+                //get: (target, eventType) => { return eventType },
                 set: (target, eventType, callback) => {
                     if (!eventType.startsWith("@")) {
                         return
@@ -329,10 +329,11 @@ export class VElement {
         if (!eventType.startsWith("@")) {
             return this;
         }
-        if (!this._events[eventType]) {
-            this._events[eventType] = [];
-        }
-        this._events[eventType].push(callback);
+        // if (!this._events[eventType]) {
+        //     this._events[eventType] = [];
+        // }
+        // this._events[eventType].push(callback);
+        this._events[eventType] =callback;
         return this;
     }
 
@@ -342,6 +343,7 @@ export class VElement {
      * @returns 
      */
     emit(eventType) {
+        console.log(this._events[eventType]);
         this._events[eventType].forEach((callback) => callback());
         return this;
     }
@@ -354,7 +356,6 @@ export class VElement {
  */
 function prepareChildren(children) {
     let preparedChildren = undefined;
-    console.log("in prepareChildren: ", children);
     if (isIterable(children)) {
         preparedChildren = [];
         for (child of children) {

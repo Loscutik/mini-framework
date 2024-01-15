@@ -13,6 +13,8 @@ App.addVElement(mim)
 App.useEvents("click", "keydown")
 App.mount(document.getElementById('app'))
 
+vUl.on('@click', ()=>{vUl.setAttr({style: "color: red;"})}); 
+
 //after mounting, test reactive
 vUl.attrs = { n: "natt" } // repllace all vUl attributes with this
 const out = new  VElement({ tag: 'div', attrs: { ID: 'out', style: "border: solid; margin: 5px;" } })
