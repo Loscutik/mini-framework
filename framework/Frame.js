@@ -8,6 +8,7 @@ import { VElement } from "./VElement.js";
 * @method mount - mount the Frame (corresponding virtual Element) to the given DOM Element (replace the existing DOM Element with rendered virtual Element)
 * @method getState - return (corresponding virtual Element) as object - TODO ? useless?
  */
+
 export class Frame {
     constructor() {
         console.log("Frame");
@@ -20,10 +21,23 @@ export class Frame {
     use(dependency, dependencyName) { // pointless?
         this.dependencies[dependencyName] = dependency;
     }
-    /** list of events fired on the DOM elements that the frame will be able to handle
-     * @param {string} events - list of events
-     * 
-      */
+
+   /**
+     * Registers a list of DOM events to handle in a frame.
+     * This function takes multiple event types and attaches them to the frame's DOM elements.
+     * It sets up a listener that stops propagation, prevents default behavior, and emits
+     * corresponding events for associated virtual elements.
+     *
+     * @param {...string} events - A list of DOM event types to handle (e.g., 'click', 'mouseover').
+     *
+     * Internally, it defines a _DOMeventsListener function which is invoked in the mount method.
+     * This listener attaches to each element and handles event propagation and default behaviors.
+     * For each triggered event, it finds the corresponding virtual element (identified by a 'vID' attribute)
+     * and emits a custom event with a naming convention starting with '@'.
+     *
+     * Usage:
+     *   frame.useEvents('click', 'hover');
+     */
     useEvents(...events) {
         this._DOMevents = events;
 
@@ -41,38 +55,36 @@ export class Frame {
         }
     }
 
-
-    /**creates virtual Element as a child of the frame.
-     * tag is for the type of element, for example tag='div' === <div>
+    /**
+     * Creates a virtual element and adds it as a child to the Frame.
      *
-     * attrs are for attributes, like style: { margin: 5px }
-     * content is a string that will be inserted as innerHTML before all its children.
-     *
-     * uu
+     * @param {Object} options - Object containing configuration options for the VElement.
+     * @param {string} options.tag - The type of HTML element ('div' for <div>).
+     * @param {Object} options.attrs - An object containing element attributes ({ style: { margin: '5px' } }).
+     * @param {string} options.content - A string representing the innerHTML of the element, will be added before all its children.
+     * @param {VirtualElement[]} options.children - An array of virtual elements to be added as children.
      */
     createElement({ tag = "", attrs = {}, content = "", children = [] }) {
         const vElem = new VElement({ tag, attrs, content, children });
         this._state.addChild(vElem);
     }
-    /**addes given virtual Element as a child to the frame.
-     *
-     * uu
-     */
+
+    /* Adds a virtual element as a child to the frame. */
     addVElement(vElem) {
         this._state.addChild(vElem);
     }
 
-    /**renders the initial virtual DOM into an actual DOM Element
-     */
+    /* Renders the initial virtual DOM into a real DOM Element */
     render() {
         return this._state.render().$elem;
     }
 
+    /* Returns the current state of the frame as an object */
     getState() {
         return { ...this._state };
     }
+
     /**
-     *
      * @param {Element} $elem the id of the element in the document to mount the DOM into (usually 'app')
      */
     mount($elem) {
