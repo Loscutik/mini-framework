@@ -1,3 +1,6 @@
+// TODO test if getter and setter work (vElm.children = [vElem1, vElem2], ch = vElm.children)
+
+
 import { VElement } from "./VElement.js";
 
 /** creates virtual Application instance
@@ -9,21 +12,33 @@ import { VElement } from "./VElement.js";
 * @method mount - mount the Frame (corresponding virtual Element) to the given DOM Element (replace the existing DOM Element with rendered virtual Element)
 * @method getState - return (corresponding virtual Element) as object - TODO ? useless?
 * @protected @property _state - the virtual Element representing the Frame
+* @property DOMEvents - declared list of DOM events you want to use, read only
 *
 *
  */
 export class Frame {
-    constructor() {
-        console.log("Frame");
-        /**@protected*/ this._state = new VElement({ tag: "div", attrs: { id: "app" } });
+    constructor(vElem = { tag: "div", attrs: { id: "app" }, content: "", children: [] }) {
+        /**@protected*/ this._state = new VElement(vElem);
         this._DOMevents = [];
         //TODO ?  pointless? -  this.dependencies = {}
 
     }
 
+    get children() {
+        return this._state.children;
+    }
+    set children(value) {
+        return this._state.children = value;
+    }
+
+    get DOMevents() {
+        return this._DOMevents;
+    }
+
     use(dependency, dependencyName) { // pointless?
         this.dependencies[dependencyName] = dependency;
     }
+
     /** declares list of events fired on the DOM elements that the frame will be able to handle
      * @param {string} events - list of events
      * @returns
@@ -49,19 +64,18 @@ export class Frame {
 
     /** creates virtual Element as a child of the frame.
      * 
-     * @param {object} param0 - object representing virtual Element
+     * @param {object} obj - object representing virtual Element, default is empty div element (like <div></div>).
      * @returns 
      */
-    createElement({ tag = "", attrs = {}, content = "", children = [] }) {
-        const vElem = new VElement({ tag, attrs, content, children });
-        this._state.addChild(vElem);
+    createElement(obj = { tag: "div", attrs: {}, content: "", children: [] }) {
+        this._state.createElement(obj);
 
         return this;
     }
 
-    /** addes given virtual Element as a child to the frame.
+    /** addes given virtual Element as a child to the frame. 
      * 
-     * @param {VElement} vElem - virtual Element
+     * @param {VElement} vElem - virtual Element 
      * @returns 
      */
     addVElement(vElem) {

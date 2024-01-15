@@ -1,3 +1,6 @@
+// TODO test if getters and setters work (vElm.attrs = {class = 'test'}, e = vElm.tag) vElm.events must return events types  which callbacks have been assigned for
+// TODO test if new VElement('string') works
+
 import { diffAttrs, diffChildren } from './functions.js';
 
 /** virtualElements that represents DOM elements
@@ -23,33 +26,50 @@ import { diffAttrs, diffChildren } from './functions.js';
 */
 export class VElement {
     /**create an element with the tag, attributes and possible children at once
+     * if the argument is string it will create virtual Element representing pure string , to change this string use vElem.content="new string" 
      *@constructor
      *
      * 
-     * @param {Object} options  
-     * @param {string=} options.tag  - ex. 'div', 'span' etc
-     * @param {{}=} options.attrs - ex. `{id: 'container'}` , attribute vID is reserved for internal use only (keep id of the corresponding vElement)
-     * @param {string= } options.content  - plain text or html
-     * @param {VElement[]?} options.children  can add children recursively by making new Elements in the children Map
+     * @param {object|string}  [vElemObj={ tag: "div", attrs: {}, content: "", children: [] }] - object representing the element, defaul is { tag: "div", attrs: {}, content: "", children: [] } 
+     * @param {string} [vElem.tag='div']  - ex. 'div', 'span' etc, default value is 'div'
+     * @param {{}=} vElem.attrs - ex. `{id: 'container'}` , attribute vID is reserved for internal use only (keep id of the corresponding vElement)
+     * @param {string= } vElem.content  - plain text or html
+     * @param {VElement[]|undefined} vElem.children  can add children recursively by making new Elements in the children Map
      */
-    constructor({ tag = "", attrs = {}, content = "", children = [] }) {
+    constructor(vElemObj = { tag: "div", attrs: {}, content: "", children: [] }) {
         this._vId = crypto.randomUUID();
 
-        const preparedChildren = children.reduce((acc, child) => {
-            acc.push([child._vId, child])
-        }, []);
+        if (typeof vElemObj === "string") {
+            vElemObj = { tag: undefined, attrs: undefined, content: vElemObj, children: undefined }
+        }
+
+        const preparedChildren = prepareChildren(vElemObj.children)
+
         console.log(`vID: ${this._vId} tag: ${tag}, content: ${content}`)
         this.state = new Proxy(
             {
-                tag: tag,
-                attrs: attrs,
-                content: content,
-                children: new Map(preparedChildren),
+                tag: vElemObj.tag,
+                attrs: vElemObj.attrs,
+                content: vElemObj.content, // need this to keep string vElement, becaose can't create Proxy of string
+                children: preparedChildren ? new Map(preparedChildren) : undefined,
             },
             {
-                get: (stateObj, key) => { return stateObj[key] },
+                get: (stateObj, key) => {
+                    if (key === 'children') {
+                        return stateObj.children.keys();
+                    }
+                    return stateObj[key]
+                },
+                /** allows to set properties tag, arggs, content, children. Any other will be ignored. value for children property is VElement[], which will be converted to Map
+                 * 
+                 */
                 set: (stateObj, key, value) => {
-                    if (value === undefined) { return }
+                    if (value === undefined ||
+                        value === null ||
+                        key === undefined ||
+                        key === null) {
+                        return
+                    }
 
                     if (key === 'tag') {
                         stateObj.tag = value;
@@ -72,20 +92,20 @@ export class VElement {
                     // works if we assighn a new array as children
                     if (key === 'children') {
                         const oldChildren = stateObj.children;
-                        const preparedChildren = children.reduce((acc, child) => {
-                            acc.push([child._vId, child])
-                        }, []);
+                        const preparedChildren = prepareChildren(value)
                         stateObj.children = new Map(preparedChildren);
                         patch = diffChildren(oldChildren, stateObj.children);
                         this.$elem = patch(this.$elem);
                     }
 
-
+                    return stateObj[key]
                 }
             }
         );
-        this.events = new Proxy({},
+
+        this._events = new Proxy({},
             {
+                get: (target, eventType) => { return eventType },
                 set: (target, eventType, callback) => {
                     if (!eventType.startsWith("@")) {
                         return
@@ -94,12 +114,42 @@ export class VElement {
                         target[eventType] = [];
                     }
                     target[eventType].push(callback);
+                    
+                    return target[eventType];
                 }
             });
     }
 
     get vId() {
         return this._vId;
+    }
+
+    get tag() {
+        return this.state.tag;
+    }
+    get attrs() {
+        return this.state.attrs;
+    }
+    get content() {
+        return this.state.content;
+    }
+    get children() {
+        return this.state.children;
+    }
+    get events() {
+        return this._events.keys()
+    }
+    set tag(value) {
+        return this.state.tag = value;
+    }
+    set attrs(value) {
+        return this.state.attrs = value;
+    }
+    set content(value) {
+        return this.state.content = value;
+    }
+    set children(value) {
+        return this.state.children = value;
     }
 
     /** get child by its vId
@@ -159,7 +209,7 @@ export class VElement {
 
     /** adds/replaces virtual element's attributes 
      * 
-     * @param {Object.<string, string>} attrs - attributes of the element
+     * @param {object.<string, string>} attrs - attributes of the element
      * @returns 
      */
     setAttr(attrs = {}) {
@@ -198,9 +248,21 @@ export class VElement {
         return this
     }
 
+    /** creates virtual Element as a child of this vElement.
+     * 
+     * @param {object} obj - object representing virtual Element, default is empty div element (like <div></div>)
+     * @returns 
+     */
+    createElement(obj = { tag: "div", attrs: {}, content: "", children: [] }) {
+        const vElem = new VElement(obj);
+        this.addChild(vElem);
+
+        return this;
+    }
+
     /** removes a child with given vId from the virtual element's children Map
      * 
-     * @param {string} vId - VElement.vId
+     * @param {string} vId  - VElement.vId
      * @returns 
      */
     delChild(vId) {
@@ -228,10 +290,10 @@ export class VElement {
         if (!eventType.startsWith("@")) {
             return this;
         }
-        if (!this.events[eventType]) {
-            this.events[eventType] = [];
+        if (!this._events[eventType]) {
+            this._events[eventType] = [];
         }
-        this.events[eventType].push(callback);
+        this._events[eventType].push(callback);
         return this;
     }
 
@@ -241,7 +303,37 @@ export class VElement {
      * @returns 
      */
     emit(eventType) {
-        this.events[eventType].forEach((callback) => callback());
+        this._events[eventType].forEach((callback) => callback());
         return this;
     }
+}
+
+/** helper - creates the array from which Map of children will be created 
+ * 
+ * @param {VElement[]=} children - list of virtual elements
+ * @returns {Array.<string,VElement>| undefined} 
+ */
+function prepareChildren(children) {
+    const preparedChildren = undefined;
+
+    if (isIterable(children)) {
+        preparedChildren = [];
+        for (child of children) {
+            preparedChildren.push([child.vId, child])
+        }
+    }
+    return preparedChildren;
+}
+
+/** helper - returns true if the obj is iterable
+ * 
+ * @param {*} obj 
+ * @returns 
+ */
+function isIterable(obj) {
+    // checks for null and undefined
+    if (obj == null) {
+        return false;
+    }
+    return typeof obj[Symbol.iterator] === 'function';
 }
