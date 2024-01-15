@@ -1,4 +1,13 @@
 import { VElement } from "./VElement.js";
+
+/**
+* @method useEvents - declare list of DOM events you want to use
+* @method createElement - create a new virtual element and add it to the Frame as a child
+* @method addVElement - add the given virtual element to the Frame as a child
+* @method render - render the Frame (corresponding virtual Element) to the DOM Element
+* @method mount - mount the Frame (corresponding virtual Element) to the given DOM Element (replace the existing DOM Element with rendered virtual Element)
+* @method getState - return (corresponding virtual Element) as object - TODO ? useless?
+ */
 export class Frame {
     constructor() {
         console.log("Frame");
