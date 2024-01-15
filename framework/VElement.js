@@ -1,5 +1,26 @@
 import { diffAttrs, diffChildren } from './functions.js';
 
+/** virtualElements that represents DOM elements
+     *
+     * 
+     * @property {string} vId -  uuid of the element (read only)
+     * @property {object} state -  objece representing html state
+     * @property {string} state.tag -  html tag
+     * @property {object} state.attrs -  html attrs
+     * @property {string} state.content -  html content
+     * @property {Map(<vElement.vId, vElement>)} state.children -  Map of virtual Elements children
+     * @property {object} events -  object's key is the event name (starting with '@'), value is callback function that will be called when the event is emitted
+     * @method render - render the virtual element to the DOM Element
+     * @method mount - mount the virtual element to the given DOM Element (replace the existing DOM Element with rendered virtual Element)
+     * @method getChild - get child by its vId
+     * @method setAttr - add/replace virtual element's attributes 
+     * @method delAttribute  - remove attribute with given name
+     * @method addClass//TODO
+     * @method addChild - add new child to the virtual element
+     * @method delChild - remove a child with given vId from the virtual element's children Map
+     * @method on - add listener (callback) to an event
+     * @method emit - fire an event 
+*/
 export class VElement {
     /**create an element with the tag, attributes and possible children at once
      *
@@ -14,10 +35,10 @@ export class VElement {
     constructor({ tag = "", attrs = {}, content = "", children = [] }) {
         this._vId = crypto.randomUUID();
 
-        const preparedChildren = children.reduce((acc, child) =>{
+        const preparedChildren = children.reduce((acc, child) => {
             acc.push([child._vId, child])
-        },[]);
-console.log(`vID: ${this._vId} tag: ${tag}, content: ${content}`)
+        }, []);
+        console.log(`vID: ${this._vId} tag: ${tag}, content: ${content}`)
         this.state = new Proxy(
             {
                 tag: tag,
@@ -51,9 +72,9 @@ console.log(`vID: ${this._vId} tag: ${tag}, content: ${content}`)
                     // works if we assighn a new array as children
                     if (key === 'children') {
                         const oldChildren = stateObj.children;
-                        const preparedChildren = children.reduce((acc, child) =>{
+                        const preparedChildren = children.reduce((acc, child) => {
                             acc.push([child._vId, child])
-                        },[]);
+                        }, []);
                         stateObj.children = new Map(preparedChildren);
                         patch = diffChildren(oldChildren, stateObj.children);
                         this.$elem = patch(this.$elem);
@@ -65,32 +86,32 @@ console.log(`vID: ${this._vId} tag: ${tag}, content: ${content}`)
         );
         this.events = new Proxy({},
             {
-               set: (target, eventType, callback)=>{
-                if (!eventType.startsWith("@")) {
-                    return
+                set: (target, eventType, callback) => {
+                    if (!eventType.startsWith("@")) {
+                        return
+                    }
+                    if (!target[eventType]) {
+                        target[eventType] = [];
+                    }
+                    target[eventType].push(callback);
                 }
-                if (!target[eventType]) {
-                    target[eventType] = [];
-                }
-                target[eventType].push(callback);
-               }
             });
     }
     get vId() {
         return this._vId;
     }
 
-    getChild(vId){
+    getChild(vId) {
         return this.state.children.get(vId);
     }
 
     render() {
-        console.log(`start render: `,this);
-        
+        console.log(`start render: `, this);
+
         if (this.state.tag === undefined || this.state.tag == '') {
             return document.createTextNode(this.state.content);
         }
-        
+
         const $elem = document.createElement(this.state.tag);
 
         for (const [k, v] of Object.entries(this.state.attrs)) {
@@ -98,15 +119,15 @@ console.log(`vID: ${this._vId} tag: ${tag}, content: ${content}`)
         }
 
         console.log(`render: content is ${this.state.content}`);
-        if (this.state.content !== undefined && this.state.content !== '')  {
+        if (this.state.content !== undefined && this.state.content !== '') {
             console.log(`render: content is ${this.state.content}`);
             $elem.innerHTML = this.state.content;
         }
 
-        this.state.children.forEach((child) => {$elem.appendChild(child.render().$elem);  console.log(`render: child - `,child);});
+        this.state.children.forEach((child) => { $elem.appendChild(child.render().$elem); console.log(`render: child - `, child); });
 
         this.$elem = $elem;
-        console.log(`render: this is ${this.vId}, this.$elem`,this.$elem);
+        console.log(`render: this is ${this.vId}, this.$elem`, this.$elem);
 
         this.$elem.setAttribute('vId', this.vId);
         return this;
@@ -133,9 +154,9 @@ console.log(`vID: ${this._vId} tag: ${tag}, content: ${content}`)
     //TODO
     addClass(className) {
     }
-/** adds a virtual element as a child  of this virtual element.
- * If this element is mounted, it will render the virtual child and mount as a child of real DOM element
-*/
+    /** adds a virtual element as a child  of this virtual element.
+     * If this element is mounted, it will render the virtual child and mount as a child of real DOM element
+    */
     addChild(vNode) {
         if (typeof vNode === 'string') {
             vNode = new VElement({ content: vNode })
@@ -152,15 +173,15 @@ console.log(`vID: ${this._vId} tag: ${tag}, content: ${content}`)
         return this
     }
 
-    delChild(vId){
+    delChild(vId) {
         this.state.children.delete(vId);
     }
 
-    delAttribute(key){
+    delAttribute(key) {
         this.state.attrs.delete(key);
     }
 
-    on(eventType, callback) { 
+    on(eventType, callback) {
         if (!eventType.startsWith("@")) {
             return
         }
@@ -170,24 +191,7 @@ console.log(`vID: ${this._vId} tag: ${tag}, content: ${content}`)
         this.events[eventType].push(callback);
     }
 
-    emit(eventType){
+    emit(eventType) {
         this.events[eventType].forEach((callback) => callback());
-    } 
-
-
-    createEvent(name) {
-        //TODO
-        this.events[name] = new Event(name);
-    }
-    listen(name, condition, callback) {
-        //TODO
-        let previousValue = condition(null);
-        this.addEventListener(name, (e) => {
-            const currentValue = condition(e);
-            if (previousValue !== currentValue) {
-                previousValue = currentValue;
-                callback(e);
-            }
-        });
     }
 }
