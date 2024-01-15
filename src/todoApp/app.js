@@ -15,7 +15,7 @@ App.mount(document.getElementById('app'))
 
 //after mounting, test reactive
 vUl.attrs = { n: "natt" } // repllace all vUl attributes with this
-const out = new  VElement({ tag: 'div', attrs: { ID: 'out' } })
+const out = new  VElement({ tag: 'div', attrs: { ID: 'out', style: "border: solid; margin: 5px;" } })
 out.mount(document.getElementById('out')).createElement({tag: 'div', content: "in 11 seconds ul innerHTML will be replaced with this text"})
 
 setTimeout(() => {
