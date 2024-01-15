@@ -17,7 +17,7 @@ import { diffAttrs, diffChildren } from './functions.js';
  * @method render - render the virtual element to the DOM Element
  * @method mount - mount the virtual element to the given DOM Element (replace the existing DOM Element with rendered virtual Element)
  * @method getChild - get child by its vId
- * @method setAttr - add/replace virtual element's attributes 
+ * @method setAttr - add/replace(with the same names) virtual element's attributes 
  * @method delAttr  - remove attribute with given name
  * @method addClass - adds className to the class attribute of this vElement
  * @method addChild - add new child to the virtual element
@@ -27,7 +27,8 @@ import { diffAttrs, diffChildren } from './functions.js';
 */
 export class VElement {
     /**create an element with the tag, attributes and possible children at once
-     * if the argument is string it will create virtual Element representing pure string , to change this string use vElem.content="new string" 
+     * if the argument is string it will create virtual Element representing pure string , 
+     * to change this string use vElem.content="new string", any other changes will be ignored
      *@constructor
      *
      * 
@@ -42,6 +43,10 @@ export class VElement {
 
         if (typeof vElemObj === "string") {
             vElemObj = { tag: undefined, attrs: undefined, content: vElemObj, children: undefined }
+        }
+
+        if (vElemObj.attrs == null) {
+            vElemObj.attrs = {};
         }
 
         const preparedChildren = prepareChildren(vElemObj.children)
@@ -73,23 +78,27 @@ export class VElement {
 
                     if (key === 'tag') {
                         stateObj.tag = value;
-                        if (this.$elem) {
-                            const $oldElm = this.$elem;
-                            this.render().mount($oldElm);
+                        if (this.$elem instanceof Element) {
+                            const $oldElm = this.$elem //neeed to keep the old $elem because after render (in the next row) it will be renewed
+                            this.render().mount($oldElm); // this is VElement, stateObj is this.state (keep forgotting)
                         }
                     }
 
                     if (key === 'content') {
                         stateObj.content = value;
-                        if (this.$elem) {
+                        if (this.$elem instanceof Element) {
                             this.$elem.innerHTML = value;
+                        } else if (this.$elem instanceof Text) {
+                            stateObj.tag = ''; // just in case 
+                            const $oldElm = this.$elem
+                            this.render().mount($oldElm);
                         }
                     }
                     // works if we assighn a new object as attrs
                     if (key === 'attrs') {
                         const oldAttrs = stateObj.attrs;
                         stateObj.attrs = value;
-                        if (this.$elem) {
+                        if (this.$elem instanceof Element) {
                             const patch = diffAttrs(oldAttrs, stateObj.attrs);
                             this.$elem = patch(this.$elem)
                         }
@@ -100,7 +109,7 @@ export class VElement {
                         const oldChildren = stateObj.children;
                         const preparedChildren = prepareChildren(value)
                         stateObj.children = new Map(preparedChildren);
-                        if (this.$elem) {
+                        if (this.$elem instanceof Element) {
                             const patch = diffChildren(oldChildren, stateObj.children);
                             this.$elem = patch(this.$elem);
                         }
@@ -176,11 +185,14 @@ export class VElement {
     render() {
         console.log(`start render: `, this);
 
-        if (this.state.tag === undefined || this.state.tag == '') {
-            return document.createTextNode(this.state.content);
+        if (this.state.tag == null || this.state.tag == '') {
+            const $elem = document.createTextNode(this.state.content);
+            this.$elem = $elem;
+            return this;
         }
 
         const $elem = document.createElement(this.state.tag);
+        this.$elem = $elem;
 
         for (const [k, v] of Object.entries(this.state.attrs)) {
             $elem.setAttribute(k, v);
@@ -195,7 +207,6 @@ export class VElement {
             this.state.children.forEach((child) => { $elem.appendChild(child.render().$elem); console.log(`render: child - `, child); });
         }
 
-        this.$elem = $elem;
         console.log(`render: this is ${this.vId}, this.$elem`, this.$elem);
 
         this.$elem.setAttribute('vId', this.vId);
@@ -216,16 +227,18 @@ export class VElement {
         return this;
     }
 
-    /** adds/replaces virtual element's attributes 
+    /** adds/replaces(with the same names) virtual element's attributes 
      * 
      * @param {object.<string, string>} attrs - attributes of the element
      * @returns 
      */
     setAttr(attrs = {}) {
-        Object.assign(this.state.attrs, attrs)
-        if (this.$elem) {
-            for (const [k, v] of Object.entries(attrs)) {
-                this.$elem.setAttribute(k, v);
+        if (this.state.tag) {
+            Object.assign(this.state.attrs, attrs)
+            if (this.$elem instanceof Element) {
+                for (const [k, v] of Object.entries(attrs)) {
+                    this.$elem.setAttribute(k, v);
+                }
             }
         }
         return this;
@@ -264,8 +277,8 @@ export class VElement {
         if (vNode instanceof VElement) {
             console.log('Adding child:  state.children  ', this.state.children)
             this.state.children.set(vNode.vId, vNode);
-            if (this.$elem) {
-                const $node = vNode.render()
+            if (this.$elem instanceof Element) {
+                const $node = vNode.render().$elem
                 this.$elem.appendChild($node);
             }
         }
@@ -279,6 +292,7 @@ export class VElement {
      * @returns 
      */
     createElement(obj = { tag: "div", attrs: {}, content: "", children: [] }) {
+        console.log("in createElement, obj: ", obj);
         const vElem = new VElement(obj);
         this.addChild(vElem);
 
