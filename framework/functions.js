@@ -30,7 +30,7 @@ export function diffAttrs(oldAttrs, newAttrs) {
     for (const [k, v] of Object.entries(oldAttrs)) {
         if (!(k in newAttrs)) {
             patches.push($node => {
-                $node.removeAttributes(k)
+                $node.removeAttribute(k)
                 return $node;
             })
         }

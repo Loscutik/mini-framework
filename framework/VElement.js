@@ -73,20 +73,26 @@ export class VElement {
 
                     if (key === 'tag') {
                         stateObj.tag = value;
-                        $oldElm = this.$elem;
-                        this.render().mount($oldElm);
+                        if (this.$elem) {
+                            const $oldElm = this.$elem;
+                            this.render().mount($oldElm);
+                        }
                     }
 
                     if (key === 'content') {
                         stateObj.content = value;
-                        this.$elem.innerHTML = value;
+                        if (this.$elem) {
+                            this.$elem.innerHTML = value;
+                        }
                     }
                     // works if we assighn a new object as attrs
                     if (key === 'attrs') {
                         const oldAttrs = stateObj.attrs;
                         stateObj.attrs = value;
-                        patch = diffAttrs(oldAttrs, stateObj.attrs);
-                        this.$elem = patch(this.$elem)
+                        if (this.$elem) {
+                            const patch = diffAttrs(oldAttrs, stateObj.attrs);
+                            this.$elem = patch(this.$elem)
+                        }
                     }
 
                     // works if we assighn a new array as children
@@ -225,7 +231,7 @@ export class VElement {
         return this;
     }
 
-    /** adds className to the class attribute of this vElement
+    /** a   
      * 
      * @param {string} className 
      * @returns 
