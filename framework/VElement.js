@@ -1,5 +1,6 @@
 // TODO test if getters and setters work (vElm.attrs = {class = 'test'}, e = vElm.tag) vElm.events must return events types  which callbacks have been assigned for
 // TODO test if new VElement('string') works
+// TODO test chained call using vElem.addChild(vElm1).setAttre({myAttr: 'test'})....
 
 import { diffAttrs, diffChildren } from './functions.js';
 
@@ -17,8 +18,8 @@ import { diffAttrs, diffChildren } from './functions.js';
  * @method mount - mount the virtual element to the given DOM Element (replace the existing DOM Element with rendered virtual Element)
  * @method getChild - get child by its vId
  * @method setAttr - add/replace virtual element's attributes 
- * @method delAttribute  - remove attribute with given name
- * @method addClass//TODO
+ * @method delAttr  - remove attribute with given name
+ * @method addClass - adds className to the class attribute of this vElement
  * @method addChild - add new child to the virtual element
  * @method delChild - remove a child with given vId from the virtual element's children Map
  * @method on - add listener (callback) to an event
@@ -114,7 +115,7 @@ export class VElement {
                         target[eventType] = [];
                     }
                     target[eventType].push(callback);
-                    
+
                     return target[eventType];
                 }
             });
@@ -222,8 +223,18 @@ export class VElement {
         return this;
     }
 
-    //TODO
+    /** adds className to the class attribute of this vElement
+     * 
+     * @param {string} className 
+     * @returns 
+     */
     addClass(className) {
+        if (this.state.attrs.class) {
+            this.state.attrs.class += ` ${className}`;
+        } else {
+            this.state.attrs.class = className;
+        }
+        return this;
     }
 
     /** adds a virtual element as a child  of this virtual element.
@@ -275,7 +286,7 @@ export class VElement {
      * @param {string} key - name of the attribute
      * @returns
      */
-    delAttribute(key) {
+    delAttr(key) {
         this.state.attrs.delete(key);
         return this;
     }

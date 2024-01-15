@@ -13,6 +13,7 @@ import { VElement } from "./VElement.js";
 * @method getState - return (corresponding virtual Element) as object - TODO ? useless?
 * @protected @property _state - the virtual Element representing the Frame
 * @property DOMEvents - declared list of DOM events you want to use, read only
+* @property children - list of this VElement's children
 *
 *
  */
@@ -24,6 +25,9 @@ export class Frame {
 
     }
 
+    /**
+     * @property children - list of this VElement's children
+    */
     get children() {
         return this._state.children;
     }
@@ -31,6 +35,9 @@ export class Frame {
         return this._state.children = value;
     }
 
+    /**
+     * @property DOMEvents - declared list of DOM events you want to use, read only
+     */
     get DOMevents() {
         return this._DOMevents;
     }
