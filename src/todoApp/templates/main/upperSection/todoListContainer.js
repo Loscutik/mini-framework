@@ -20,7 +20,7 @@ export const insideUpperSection = [
                 class: "toggle-all",
                 type: "checkbox",
                 id: "toggle-all",
-                onClick: clickToggle()
+                onClick: clickToggle
                 },
             }),
             new VElement({

@@ -1,6 +1,13 @@
 import { VElement } from "../../../../../../framework/VElement.js"
 
 
+
+let yes = ""
+
+function updateValue() {
+    todoInput.children[1].attrs.value = "yeeee"
+}
+
 export const todoInput = new VElement({
         tag: "header",
         attrs: { class: "header" },
@@ -13,6 +20,8 @@ export const todoInput = new VElement({
         attrs: {
             class: "new-todo",
             placeholder:"What needs to be done?",
+            value: "y",
+            onClick: updateValue
         }
         })],
     })

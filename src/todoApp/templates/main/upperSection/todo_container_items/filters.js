@@ -1,5 +1,9 @@
 import { VElement } from "../../../../../../framework/VElement.js"
 
+function jaaas() {
+  console.log("jaaaas")
+}
+
 export const filtersSection = new VElement({
   tag: "ul",
   attrs: {
@@ -27,8 +31,10 @@ export const filtersSection = new VElement({
           attrs: {
             class: "selected", // set attribute selected when the route is according to the button
             href: "#/active",
+            
           },
           content: "Active",
+          "@click": (velm) => {jaaas()} 
         }),
       ],
     }),
