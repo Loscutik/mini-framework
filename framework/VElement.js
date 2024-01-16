@@ -1,5 +1,4 @@
-// TODO test if getters and setters work (vElm.attrs = {class = 'test'}, e = vElm.tag) vElm.events must return events types  which callbacks have been assigned for
-// TODO test if new VElement('string') works
+// TODO test if  and setter for children works
 // TODO test chained call using vElem.addChild(vElm1).setAttre({myAttr: 'test'})....
 
 import { diffAttrs, diffChildren } from './functions.js';
@@ -13,10 +12,10 @@ import { diffAttrs, diffChildren } from './functions.js';
  * @property {object} state.attrs -  html attrs
  * @property {string} state.content -  html content
  * @property {Map.<vElement.vId, vElement>} state.children -  Map of virtual Elements children
- * @property {object} events -  object's key is the event name (starting with '@'), value is callback function that will be called when the event is emitted
+ * @property {object} events -  (read only) object's key is the event name (starting with '@'), value is callback function that will be called when the event is emitted
  * @method render - render the virtual element to the DOM Element
  * @method mount - mount the virtual element to the given DOM Element (replace the existing DOM Element with rendered virtual Element)
- * @method getChild - get child by its vId
+ * @method getChild - get child recursively by its vId
  * @method setAttr - add/replace(with the same names) virtual element's attributes 
  * @method delAttr  - remove attribute with given name
  * @method addClass - adds className to the class attribute of this vElement
@@ -26,9 +25,18 @@ import { diffAttrs, diffChildren } from './functions.js';
  * @method emit - fire an event 
 */
 export class VElement {
-    /**create an element with the tag, attributes and possible children at once
-     * if the argument is string it will create virtual Element representing pure string , 
-     * to change this string use vElem.content="new string", any other changes will be ignored
+    /**create an element with the tag, attributes,  possible children, and events at once.
+     * 
+     * If the argument is string it will create virtual Element representing pure string , 
+     * to change this string use vElem.content="new string", any other changes will be ignored.
+     * If the argument is an object, next properties will beare allowd (any others will be ignored):
+     *   tag - the tag name
+     *   attrs - the attributes
+     *   children - array of VElements
+     *   content - the text to be inserted into the DOM Element
+     *   parameters with name starting with `@` and  a function as the value - those will be considered as events, their values as handlers, 
+     *   for exaample '@click': (velm) => { velm.setAttr({ style: "color: green;" })}
+     * Events 'name (if there is any) must start with `@` 
      *@constructor
      *
      * 
@@ -41,17 +49,22 @@ export class VElement {
     constructor(vElemObj = { tag: "div", attrs: {}, content: "", children: [] }) {
         this._vId = crypto.randomUUID();
 
+        if (typeof vElemObj === "object") {
+            if (vElemObj.attrs == null) {
+                vElemObj.attrs = {};
+            }
+            if (vElemObj.children == null) {
+                vElemObj.children = {};
+            }
+        }
+
         if (typeof vElemObj === "string") {
             vElemObj = { tag: undefined, attrs: undefined, content: vElemObj, children: undefined }
         }
 
-        if (vElemObj.attrs == null) {
-            vElemObj.attrs = {};
-        }
 
         const preparedChildren = prepareChildren(vElemObj.children)
 
-        console.log(`vID: ${this._vId} tag: ${vElemObj.tag}, content: ${vElemObj.content}`)
         this.state = new Proxy(
             {
                 tag: vElemObj.tag,
@@ -67,7 +80,7 @@ export class VElement {
                  * 
                  */
                 set: (stateObj, key, value) => {
-                    console.log(`in VElement.state Proxy setter: params are: `, stateObj, key, value);
+                   // console.log(`in VElement.state Proxy setter: params are: `, stateObj, key, value);
 
                     if (value === undefined ||
                         value === null ||
@@ -120,12 +133,14 @@ export class VElement {
             }
         );
 
+        console.log(`this: `, this)
+
+
         this._events = new Proxy({},
             {
-                //get: (target, eventType) => { return eventType },
                 set: (target, eventType, callback) => {
                     if (!eventType.startsWith("@")) {
-                        return
+                        throw new Error("events set error: wrong event type: " + eventType)
                     }
                     if (!target[eventType]) {
                         target[eventType] = [];
@@ -133,8 +148,14 @@ export class VElement {
                     target[eventType].push(callback);
 
                     return target[eventType];
-                }
+                },
             });
+
+        for (const prop in vElemObj) {
+            if (prop.startsWith('@')) {
+                this._events[prop] = vElemObj[prop];
+            }
+        }
     }
 
     get vId() {
@@ -151,11 +172,13 @@ export class VElement {
         return this.state.content;
     }
     get children() {
-        return this.state.children.keys();
+        if (this.state.children == null) return this.state.children;
+        return this.state.children.entries(); // remember the children property is Map
     }
     get events() {
-        return this._events.keys()
+        return Object.entries(this._events)
     }
+
     set tag(value) {
         return this.state.tag = value;
     }
@@ -175,7 +198,19 @@ export class VElement {
      * @returns 
      */
     getChild(vId) {
-        return this.state.children.get(vId);
+        console.log("getChild search for vId: " + vId + " in state: ", this.state);
+        const children = this.state.children
+        let searchChild
+        if (children){
+            searchChild = children.get(vId);
+            if (!searchChild) {
+                for (const [key,child] of children) {
+                    searchChild = child.getChild(vId);
+                    if (searchChild) return searchChild
+                }
+            }
+        }
+        return searchChild;
     }
 
     /** render the virtual element to the DOM Element
@@ -207,8 +242,6 @@ export class VElement {
             this.state.children.forEach((child) => { $elem.appendChild(child.render().$elem); console.log(`render: child - `, child); });
         }
 
-        console.log(`render: this is ${this.vId}, this.$elem`, this.$elem);
-
         this.$elem.setAttribute('vId', this.vId);
         return this;
     }
@@ -220,10 +253,8 @@ export class VElement {
      */
 
     mount($elem) {
-        console.log(`mounting: this is :${this.state.tag}, ${this.$elem}`, this);
-        console.log(`mounting: $elem`, $elem);
+        console.log(`mounting to $elem: `, $elem);
         $elem.replaceWith(this.render().$elem);
-        console.log(`mounting: this is :${this.state.tag}, ${this.$elem}`, this);
         return this;
     }
 
@@ -326,14 +357,12 @@ export class VElement {
      * @returns 
      */
     on(eventType, callback) {
-        if (!eventType.startsWith("@")) {
-            return this;
+        // _events' setter do all checking and setting 
+        try {
+            this._events[eventType] = callback;
+        } catch (e) {
+            console.error("cant add listener for event " + eventType + ", err " + e)
         }
-        // if (!this._events[eventType]) {
-        //     this._events[eventType] = [];
-        // }
-        // this._events[eventType].push(callback);
-        this._events[eventType] =callback;
         return this;
     }
 
@@ -344,7 +373,7 @@ export class VElement {
      */
     emit(eventType) {
         console.log(this._events[eventType]);
-        this._events[eventType].forEach((callback) => callback());
+        this._events[eventType].forEach((callback) => callback(this));
         return this;
     }
 }
