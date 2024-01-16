@@ -198,7 +198,7 @@ export class VElement {
      * @returns 
      */
     getChild(vId) {
-        console.log("getChild search for vId: " + vId + " in state: ", this.state);
+        // console.log("getChild search for vId: " + vId + " in state: ", this.state);
         const children = this.state.children
         let searchChild
         if (children) {
@@ -218,7 +218,7 @@ export class VElement {
      * @returns  
      */
     render() {
-        console.log(`start render: `, this);
+        // console.log(`start render: `, this);
 
         if (this.state.tag == null || this.state.tag == '') {
             const $elem = document.createTextNode(this.state.content);
@@ -234,12 +234,14 @@ export class VElement {
         }
 
         if (this.state.content !== undefined && this.state.content !== '') {
-            console.log(`render: content is ${this.state.content}`);
+            // console.log(`render: content is ${this.state.content}`);
             $elem.innerHTML = this.state.content;
         }
 
         if (this.state.children) {
-            this.state.children.forEach((child) => { $elem.appendChild(child.render().$elem); console.log(`render: child - `, child); });
+          this.state.children.forEach((child) => {
+            $elem.appendChild(child.render().$elem);
+          }); //console.log(`render: child - `, child);
         }
 
         this.$elem.setAttribute('vId', this.vId);
@@ -371,9 +373,11 @@ export class VElement {
      * @param {string} eventType 
      * @returns 
      */
-    emit(eventType) {
+    emit(eventType, event) {
         console.log(this._events[eventType]);
-        this._events[eventType].forEach((callback) => callback(this));
+        this._events[eventType].forEach((callback) => {
+            callback(this, event);
+        } );
         return this;
     }
 }

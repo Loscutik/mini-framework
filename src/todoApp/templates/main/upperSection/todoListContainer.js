@@ -3,10 +3,6 @@ import { vTodoList } from "./todo_container_items/todoList.js";
 import { filtersSection } from "./todo_container_items/filters.js";
 import { todoInput } from "./todo_container_items/todoInput.js";
 
-function clickToggle() {
-    console.log("clicking toggle-all");
-}
-
 export const insideUpperSection = [
     todoInput,
     new VElement({
@@ -20,7 +16,6 @@ export const insideUpperSection = [
                 class: "toggle-all",
                 type: "checkbox",
                 id: "toggle-all",
-                onClick: clickToggle
                 },
             }),
             new VElement({

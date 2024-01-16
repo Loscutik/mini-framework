@@ -1,4 +1,4 @@
-import { Frame } from '../../framework/Frame.js';
+/* import { Frame } from '../../framework/Frame.js';
 import { VElement } from '../../framework/VElement.js';
 
 const App = new Frame()
@@ -92,4 +92,4 @@ function getEvents(vEl) {
     }}
     return events
 
-}
+} */

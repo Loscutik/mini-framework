@@ -1,8 +1,5 @@
 import { VElement } from "../../../../../../framework/VElement.js"
-
-function jaaas() {
-  console.log("jaaaas")
-}
+import { router } from "../../../../app.js";
 
 export const filtersSection = new VElement({
   tag: "ul",
@@ -20,6 +17,9 @@ export const filtersSection = new VElement({
             href: "#/",
           },
           content: "All",
+          "@click": (velm) => {
+            router.routeTo("#/");
+          },
         }),
       ],
     }),
@@ -31,10 +31,11 @@ export const filtersSection = new VElement({
           attrs: {
             class: "selected", // set attribute selected when the route is according to the button
             href: "#/active",
-            
           },
           content: "Active",
-          "@click": (velm) => {jaaas()} 
+          "@click": (velm) => {
+            router.routeTo("#/active");
+          },
         }),
       ],
     }),
@@ -48,6 +49,9 @@ export const filtersSection = new VElement({
             href: "#/completed",
           },
           content: "Completed",
+          "@click": (velm) => {
+            router.routeTo("#/completed");
+          },
         }),
       ],
     }),

@@ -7,7 +7,7 @@ import { newVMain} from './templates/mainPage_old.js';
 import { mainDiv } from './templates/vMainPage.js';
 
 
-const router = createRouter(routes);
+export const router = createRouter(routes);
 export const App = new Frame()
 
 App.useEvents("click", "keydown")
