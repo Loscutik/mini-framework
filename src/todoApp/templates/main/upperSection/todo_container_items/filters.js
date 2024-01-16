@@ -1,4 +1,4 @@
-import { VElement } from "../../../../../framework/VElement.js"
+import { VElement } from "../../../../../../framework/VElement.js"
 
 export const filtersSection = new VElement({
   tag: "ul",

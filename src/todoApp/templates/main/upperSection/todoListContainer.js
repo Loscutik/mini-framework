@@ -1,8 +1,11 @@
 import { VElement } from "../../../../../framework/VElement.js";
-import { vTodoList } from "../../../reactive_objects/todoList.js";
-import { filtersSection } from "./filters.js";
-import { todoInput } from "./todoInput.js";
+import { vTodoList } from "./todo_container_items/todoList.js";
+import { filtersSection } from "./todo_container_items/filters.js";
+import { todoInput } from "./todo_container_items/todoInput.js";
 
+function clickToggle() {
+    console.log("clicking toggle-all");
+}
 
 export const insideUpperSection = [
     todoInput,
@@ -17,9 +20,7 @@ export const insideUpperSection = [
                 class: "toggle-all",
                 type: "checkbox",
                 id: "toggle-all",
-                onClick: function() {
-                        return console.log("clickijng jees");
-                    },
+                onClick: clickToggle()
                 },
             }),
             new VElement({

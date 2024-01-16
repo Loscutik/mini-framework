@@ -1,6 +1,6 @@
 import { vApp } from "../app.js"
 import { VElement } from "../../framework/VElement.js"
-import { mainPageInnerHTML } from "./templates/mainPage.js"
+import { mainPageInnerHTML } from "./templates/mainPage_old.js"
 
 export function launchPage() {
     const body = document.createElement("div")

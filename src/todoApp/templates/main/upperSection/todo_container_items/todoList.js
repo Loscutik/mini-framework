@@ -1,5 +1,5 @@
-import { VElement } from "../../../framework/VElement.js";
-import { todoList } from "../models/todo_model.js";
+import { VElement } from "../../../../../../framework/VElement.js";
+import { todoList } from "../../../../models/todo_model.js";
 
 export const vTodoList = new VElement({
   tag: "ul",
