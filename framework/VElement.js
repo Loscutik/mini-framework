@@ -118,17 +118,20 @@ export class VElement {
                         }
                     }
 
-                    // works if we assighn a new array as children
+                    // works if we assign a Map or undefined as children
                     if (key === 'children') {
                         const oldChildren = stateObj.children;
-                        const preparedChildren = prepareChildren(value)
-                        stateObj.children = new Map(preparedChildren);
-                        if (this.$elem instanceof Element) {
-                            const patch = diffChildren(oldChildren, stateObj.children);
-                            this.$elem = patch(this.$elem);
+                        console.log('in setter for children0' , value);
+                        if (value == null || (value instanceof Map && stateObj.tag)) {
+                            console.log('in setter for children' , value);
+                            stateObj.children = value;
+                            if (this.$elem instanceof Element) {
+                                const patch = diffChildren(oldChildren, stateObj.children);
+                                this.$elem = patch(this.$elem);
+                            }
                         }
-                    }
 
+                    }
                     return stateObj[key]
                 }
             }
@@ -137,7 +140,6 @@ export class VElement {
         this._events = new Proxy({},
             {
                 set: (target, eventType, callback) => {
-                    console.log("in event setter: ", this.tag, ' -- ',eventType)
                     if (!eventType.startsWith("@") || !(typeof callback === 'function')) {
                         throw new Error("events set error: wrong event type: " + eventType)
                     }
@@ -176,7 +178,7 @@ export class VElement {
     }
     get children() {
         if (this.state.children == null) return this.state.children;
-        return this.state.children.entries(); // remember the children property is Map
+        return this.state.children.values(); // remember the children property is Map
     }
     get events() {
         return Object.entries(this._events)
@@ -192,7 +194,20 @@ export class VElement {
         return this.state.content = value;
     }
     set children(value) {
-        return this.state.children = value;
+        switch (true) {
+            case value instanceof Array:
+                const preparedChildren = prepareChildren(value)
+                this.state.children = new Map(preparedChildren);
+                break;
+            case value instanceof Map:
+                this.state.children = value;
+                break;
+            default:
+                console.error("can't assign the children property other than Array or Map");
+                break;
+        }
+
+        return this.state.children;
     }
 
     /** get child by its vId
@@ -390,7 +405,12 @@ function prepareChildren(children) {
     if (isIterable(children)) {
         preparedChildren = [];
         for (const child of children) {
-            preparedChildren.push([child.vId, child])
+            if (child instanceof VElement) {
+                preparedChildren.push([child.vId, child]);
+            } else {
+                const newElm = new VElement(child);
+                preparedChildren.push([newElm.vId, newElm]);
+            }
         }
     }
     return preparedChildren;

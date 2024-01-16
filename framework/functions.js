@@ -47,8 +47,8 @@ export function diffAttrs(oldAttrs, newAttrs) {
 
 /**
  * 
- * @param {Map.<vElement.vId, vElement>} oldVChildren 
- * @param {Map.<vElement.vId, vElement>} newVChildren 
+ * @param {Map.<VElement.vId, VElement>} oldVChildren 
+ * @param {Map.<VElement.vId, VElement>} newVChildren 
  */
 export function diffChildren(oldVChildren, newVChildren) {
     if (oldVChildren == null && newVChildren == null) {
@@ -56,13 +56,13 @@ export function diffChildren(oldVChildren, newVChildren) {
     }
 
     if (newVChildren == null) {
-        return () => {
-            oldVChildren.clear();
+        return ($parent) => {
+            $parent.replaceChildren();
         }
     }
 
     // from this momemt newChilden is not null or undefined
-    const childrenPatches = [];
+    const childrenPatches = new Map();
     const additionalPatches = [];
 
     if (oldVChildren == null) {
@@ -74,11 +74,13 @@ export function diffChildren(oldVChildren, newVChildren) {
         });
     } else { // oldVChildren also != null
         oldVChildren.forEach((oldVChild, vId) => {
-            childrenPatches.push(diff(oldVChild, newVChildren.get(vId)));
+            console.log('in diffChildren', vId, oldVChild)
+            console.log('in diffChildren vid in new', newVChildren.get(vId));
+            childrenPatches.set(vId, diff(oldVChild, newVChildren.get(vId)));
         });
 
         newVChildren.forEach(newVChild => {
-            if (!oldVChildren.has(newVChild.vID)) {
+            if (!oldVChildren.has(newVChild.vId)) {
                 additionalPatches.push($node => {
                     $node.appendChild(newVChild.render().$elem);
                     return $node;
@@ -86,12 +88,15 @@ export function diffChildren(oldVChildren, newVChildren) {
             }
         });
     }
-    
-    return $parent => {
 
-        $parent.childNodes.forEach(($child, i) => {
-            childrenPatches[i]($child);
+    return $parent => {
+        childrenPatches.forEach((patch, vId) => {
+            patch($parent.querySelector(`[vId='${vId}']`));
         });
+        console.log('in diffChildren apply putches',  $parent.childNodes)
+        // $parent.childNodes.forEach(($child, i) => {
+        //     childrenPatches[i]($child);
+        // });
 
         for (const patch of additionalPatches) {
             patch($parent);
@@ -105,7 +110,7 @@ export function diffChildren(oldVChildren, newVChildren) {
  * @param {VElement} vNewNode 
  */
 function diff(vOldNode, vNewNode) {
-    if (vNewNode.state === undefined) {
+    if (vNewNode === undefined) {
         return $n => {
             $n.remove();
             return undefined
@@ -146,29 +151,29 @@ function diff(vOldNode, vNewNode) {
 
 
 export function convertDOMtoVDOM(HTMLElement) {
-  const vElem = new VElement({
-    tag: HTMLElement.nodeName.toLowerCase(),
-    attrs: getHTMLProps(HTMLElement.attributes),
-    content: HTMLElement.children.length==0? HTMLElement.textContent:"", // if an element has children HTML elements, we don't count it as innerHTML
-    children: returnChildren(HTMLElement),
-  });
-  return vElem;
+    const vElem = new VElement({
+        tag: HTMLElement.nodeName.toLowerCase(),
+        attrs: getHTMLProps(HTMLElement.attributes),
+        content: HTMLElement.children.length == 0 ? HTMLElement.textContent : "", // if an element has children HTML elements, we don't count it as innerHTML
+        children: returnChildren(HTMLElement),
+    });
+    return vElem;
 }
 function getHTMLProps(attributes) {
-  const props = {};
-  for (let i = 0; i < attributes.length; i++) {
-    props[attributes[i].name] = attributes[i].value;
-  }
-  return props;
+    const props = {};
+    for (let i = 0; i < attributes.length; i++) {
+        props[attributes[i].name] = attributes[i].value;
+    }
+    return props;
 }
 
 function returnChildren(HTMLElement) {
-  const vChildren = [];
-  for (const child of HTMLElement.children) {
-    const vChild = convertDOMtoVDOM(child);
-    vChildren.push(vChild);
-  }
-  return vChildren;
+    const vChildren = [];
+    for (const child of HTMLElement.children) {
+        const vChild = convertDOMtoVDOM(child);
+        vChildren.push(vChild);
+    }
+    return vChildren;
 }
 
 export function convertStringTemplateToVDOM(template) {

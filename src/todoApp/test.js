@@ -38,11 +38,13 @@ const lbl = new VElement({
 const inp = new VElement({
     tag: "input",
     attrs: { id: "inp2", type: "text", class: "cl", },
-    'keydown': (vElem, event) => { vElem.setAttr({ style: "color: blue;" }); 
-    let text = event.target.value; //
+    'keydown': (vElem, event) => {
+        vElem.setAttr({ style: "color: blue;" });
+        let text = event.target.value; //
 
-    vElem.setAttr({value: text+event.key});
-    lbl.content="you pressed: " + event.keyCode;}
+        vElem.setAttr({ value: text + event.key });
+        lbl.content = "you pressed: " + event.keyCode;
+    }
 });
 App.addVElement(inp).addVElement(lbl);
 App.addVElement(vUl);
@@ -57,7 +59,8 @@ vUl.on('@keydown', (vElem, event) => { vElem.setAttr({ style: "color: blue;" });
 vUl.attrs = { n: "natt" } // repllace all vUl attributes with this
 const out = new VElement({ tag: 'div', attrs: { ID: 'out', style: "border: solid; margin: 5px;" } })
 out.mount(document.getElementById('out')).createElement({ tag: 'div', content: "in 7 seconds ul innerHTML will be replaced with this text" })
-
+// tests of methods
+//out.content = vUl.vId + ' ' + vUl.tag + ' ' + vUl.attrs + ' ' + vUl.content + ' ' + vUl.children + ' ' + vUl.events
 setTimeout(() => {
     vUl.addChild(new VElement({ tag: 'li', attrs: { ID: 'li3', class: 'cl' }, content: 'new element added', '@click': (velm) => { velm.setAttr({ style: "color: green;" }) } }))
     out.addChild(new VElement({ tag: 'p', content: `added new li in ul, ul's children are ${vUl.children}` }));
@@ -72,6 +75,16 @@ setTimeout(() => {
 
 setTimeout(() => {
     mim.tag = 'h3'
+    // test cases for children
+    // - Map
+    // - Array of vElm
+    // - Array of Object like for creating
+    // - []
+    // - wrong - velem, string, ovject
+    //vUl.children = out.state.children
+    vUl.children = [new VElement({ tag: 'li', attrs: { ID: 'lin1' }, content: 'set: new element1' }),
+    new VElement({ tag: 'li', attrs: { ID: 'lin2' }, content: 'set: new element2' }),]
+    console.log("test children setter: vUl:", vUl)
 
     out.addChild(new VElement({ tag: 'p', content: `tag changed input -> h3 (tag: ${mim.tag})` }));
 }, 6000)
@@ -99,7 +112,7 @@ function getEvents(vEl) {
     }
     events += `\n\n`
     if (vEl.children) {
-        for (const [vId, child] of vEl.children) {
+        for (const child of vEl.children) {
             events += getEvents(child)
         }
     }
