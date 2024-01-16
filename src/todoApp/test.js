@@ -11,7 +11,7 @@ const vUl = new VElement({
     tag: "ul",
     attrs: { ID: "list", class: "cl" },
     content: "in 7 seconds ul innerHTML will be replaced with a text",
-   // '@click': (velm) => { velm.setAttr({ style: "color: yellow;" }) } ,
+    '@click': (velm) => { velm.setAttr({ style: "color: yellow;" }) },
 });
 vUl.addChild(
     new VElement({
@@ -31,13 +31,27 @@ const mim = new VElement({
     tag: "input",
     attrs: { type: "text", class: "cl", value: "change in 4 sec" },
 });
+const lbl = new VElement({
+    tag: "label",
+    attrs: { for: "inp2", },
+});
+const inp = new VElement({
+    tag: "input",
+    attrs: { id: "inp2", type: "text", class: "cl", },
+    '@keydown': (vElem, event) => { vElem.setAttr({ style: "color: blue;" }); 
+    // let text = event.target.value; //
+
+    // vElem.setAttr({value: text+event.key});
+    lbl.content="you pressed: " + event.keyCode;}
+});
+App.addVElement(inp).addVElement(lbl);
 App.addVElement(vUl);
 App.addVElement(mim);
 
 
 
 
-vUl.on('@click', () => { vUl.setAttr({ style: "color: red;" }) });
+vUl.on('@keydown', (vElem, event) => { vElem.setAttr({ style: "color: blue;" }); console.log("you pressed: ", event.keyCode); });
 
 //after mounting, test reactive
 vUl.attrs = { n: "natt" } // repllace all vUl attributes with this
@@ -76,7 +90,7 @@ setTimeout(() => {
 function getEvents(vEl) {
     let events = ''
     events += 'elm: ' + vEl.tag + ': '
-    for (const [event,funcs] of vEl.events) {
+    for (const [event, funcs] of vEl.events) {
         events += event + ': '
         for (const func of funcs) {
             events += func + ' | '
@@ -86,10 +100,11 @@ function getEvents(vEl) {
     events += `\n\n`
     console.log(vEl)
     console.log(vEl.children)
-    if (vEl.children){
-        for (const [vId,child] of vEl.children) {
-        events +=getEvents(child)
-    }}
+    if (vEl.children) {
+        for (const [vId, child] of vEl.children) {
+            events += getEvents(child)
+        }
+    }
     return events
 
 }
