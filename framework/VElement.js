@@ -49,6 +49,7 @@ export class VElement {
     constructor(vElemObj = { tag: "div", attrs: {}, content: "", children: [] }) {
         this._vId = crypto.randomUUID();
 
+        // for non string elements attributes and children are not null to prevent checking them in all methods and functions 
         if (typeof vElemObj === "object") {
             if (vElemObj.attrs == null) {
                 vElemObj.attrs = {};
@@ -133,13 +134,11 @@ export class VElement {
             }
         );
 
-        console.log(`this: `, this)
-
-
         this._events = new Proxy({},
             {
                 set: (target, eventType, callback) => {
-                    if (!eventType.startsWith("@")) {
+                    console.log("in event setter: ", this.tag, ' -- ',eventType)
+                    if (!eventType.startsWith("@") || !(typeof callback === 'function')) {
                         throw new Error("events set error: wrong event type: " + eventType)
                     }
                     if (!target[eventType]) {
@@ -152,8 +151,12 @@ export class VElement {
             });
 
         for (const prop in vElemObj) {
-            if (prop.startsWith('@') && typeof vElemObj[prop] === 'function') {
-                this._events[prop] = vElemObj[prop];
+            if (prop.startsWith('@')) {
+                try {
+                    this._events[prop] = vElemObj[prop];
+                } catch (e) {
+                    console.error("cant add listener for event " + prop + ", err " + e)
+                }
             }
         }
     }

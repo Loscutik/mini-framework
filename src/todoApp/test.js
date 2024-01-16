@@ -38,7 +38,7 @@ const lbl = new VElement({
 const inp = new VElement({
     tag: "input",
     attrs: { id: "inp2", type: "text", class: "cl", },
-    '@keydown': (vElem, event) => { vElem.setAttr({ style: "color: blue;" }); 
+    'keydown': (vElem, event) => { vElem.setAttr({ style: "color: blue;" }); 
     let text = event.target.value; //
 
     vElem.setAttr({value: text+event.key});
@@ -98,8 +98,6 @@ function getEvents(vEl) {
         events += `\n`
     }
     events += `\n\n`
-    console.log(vEl)
-    console.log(vEl.children)
     if (vEl.children) {
         for (const [vId, child] of vEl.children) {
             events += getEvents(child)
