@@ -1,4 +1,4 @@
-// TODO test if  and setter for children works
+// TODO test if  setter for children works
 // TODO test chained call using vElem.addChild(vElm1).setAttre({myAttr: 'test'})....
 
 import { diffAttrs, diffChildren } from './functions.js';
@@ -80,7 +80,7 @@ export class VElement {
                  * 
                  */
                 set: (stateObj, key, value) => {
-                   // console.log(`in VElement.state Proxy setter: params are: `, stateObj, key, value);
+                    // console.log(`in VElement.state Proxy setter: params are: `, stateObj, key, value);
 
                     if (value === undefined ||
                         value === null ||
@@ -152,7 +152,7 @@ export class VElement {
             });
 
         for (const prop in vElemObj) {
-            if (prop.startsWith('@')) {
+            if (prop.startsWith('@') && typeof vElemObj[prop] === 'function') {
                 this._events[prop] = vElemObj[prop];
             }
         }
@@ -201,10 +201,10 @@ export class VElement {
         console.log("getChild search for vId: " + vId + " in state: ", this.state);
         const children = this.state.children
         let searchChild
-        if (children){
+        if (children) {
             searchChild = children.get(vId);
             if (!searchChild) {
-                for (const [key,child] of children) {
+                for (const [key, child] of children) {
                     searchChild = child.getChild(vId);
                     if (searchChild) return searchChild
                 }
