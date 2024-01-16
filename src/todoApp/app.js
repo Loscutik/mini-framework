@@ -1,18 +1,60 @@
 import { Frame } from '../../framework/Frame.js';
 import { VElement } from '../../framework/VElement.js';
+import createRouter from '../../framework/router.js';
+import { vTodoList } from './reactive_objects/todoList.js';
+import { routes } from './routes.js';
+import { newVMain} from './templates/mainPage.js';
+import { mainDiv } from './templates/vMainPage.js';
 
-const App = new Frame()
-const vElem = new VElement({ tag: 'div', attrs: { ID: 'item', class: 'cl' }, content: 'text', })
-App.addVElement(vElem)
-const vUl = new VElement({ tag: 'ul', attrs: { ID: 'list', class: 'cl' }, content: 'in 11 seconds ul innerHTML will be replaced with a text', })
-vUl.addChild(new VElement({ tag: 'li', attrs: { ID: 'li1', class: 'cl' }, content: 'text1', }))
-vUl.addChild(new VElement({ tag: 'li', attrs: { ID: 'li2', class: 'cl' }, content: 'text2', }))
-const mim = new VElement({ tag: 'input', attrs: { type: 'text', class: 'cl' , value: 'change in 6 sec'}, })
-App.addVElement(vUl)
-App.addVElement(mim)
+
+const router = createRouter(routes);
+export const App = new Frame()
+
 App.useEvents("click", "keydown")
+
 App.mount(document.getElementById('app'))
 
+App.addVElement(mainDiv);
+
+// add todo list
+
+/* App.addVElement(newVMain);
+const todoContainer = App.getVElementByID("todo-container");
+todoContainer.addChild(vTodoList); */
+
+
+// testing stuff
+
+/* 
+const vUl = new VElement({
+  tag: "ul",
+  attrs: { ID: "list", class: "cl" },
+  content: "in 11 seconds ul innerHTML will be replaced with a text",
+});
+vUl.addChild(
+  new VElement({
+    tag: "li",
+    attrs: { ID: "li1", class: "cl" },
+    content: "text1",
+  })
+);
+vUl.addChild(
+  new VElement({
+    tag: "li",
+    attrs: { ID: "li2", class: "cl" },
+    content: "text2",
+  })
+);
+const mim = new VElement({
+  tag: "input",
+  attrs: { type: "text", class: "cl", value: "change in 6 sec" },
+});
+App.addVElement(vUl);
+App.addVElement(mim);
+ */
+
+
+/* 
 vUl.on('@click', ()=>{vUl.setAttr({style: "color: red;"})}); 
 
 //after mounting, test reactive
@@ -41,5 +83,5 @@ setTimeout(() => {
     out.addChild(new VElement({tag: 'p', content:`tag changed input -> h3 (tag: ${mim.tag})` }));
 }, 9000)
 
-
+ */
 

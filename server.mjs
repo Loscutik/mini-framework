@@ -7,7 +7,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const UIDir = join(__dirname, '')
 const indexPage = join(UIDir, 'index.html');
 
-
 const server = http.createServer((request, response) => {
   const { headers, method, url } = request;
   let body = [];
@@ -31,6 +30,8 @@ const server = http.createServer((request, response) => {
       response.statusCode = 200;
       if (url.startsWith('/src/') || url.startsWith('/framework/')) {
         response.setHeader('Content-Type', 'text/javascript; charset=utf-8');
+      } else if (url == "/style.css"){
+        response.setHeader('Content-Type', 'text/css; charset=utf-8');
       } else {
         response.setHeader('Content-Type', 'text/html; charset=utf-8');
       }
@@ -50,7 +51,10 @@ const server = http.createServer((request, response) => {
 
     });
 })
+
 let port = 8080;
+
+
 server.listen(port);
 
 console.log(`Server listening on  http://localhost:${port}...`);

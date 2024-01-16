@@ -1,8 +1,9 @@
-import { FILTER_ALL } from "../consts";
-import { filters } from "./filter_model";
+import { FILTER_ALL } from "../consts.js";
+import { filters } from "./filter_model.js";
 
-export default class TodoList {
+class TodoList {
   // the todos should be objects with properties
+
   todos = []; // TODO: render this in the virtual DOM somehow
   /**
    * @param {string} todo
@@ -40,4 +41,4 @@ export default class TodoList {
 }
 
 
-const todoList = new TodoList();
+export const todoList = new TodoList();

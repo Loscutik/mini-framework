@@ -1,6 +1,7 @@
 // on event
 
 // import { vApp } from "../app"; //  we must not use app in framwork, but use framework in app (like vue doesn't know about our app)
+import { VElement } from "./VElement.js";
 import render from "./render.js"
 
 // compare the old vApp to the new vApp
@@ -141,4 +142,41 @@ function diff(vOldNode, vNewNode) {
         return $n;
 
     }
+}
+
+
+export function convertDOMtoVDOM(HTMLElement) {
+  const vElem = new VElement({
+    tag: HTMLElement.nodeName.toLowerCase(),
+    attrs: getHTMLProps(HTMLElement.attributes),
+    content: HTMLElement.children.length==0? HTMLElement.textContent:"", // if an element has children HTML elements, we don't count it as innerHTML
+    children: returnChildren(HTMLElement),
+  });
+  return vElem;
+}
+function getHTMLProps(attributes) {
+  const props = {};
+  for (let i = 0; i < attributes.length; i++) {
+    props[attributes[i].name] = attributes[i].value;
+  }
+  return props;
+}
+
+function returnChildren(HTMLElement) {
+  const vChildren = [];
+  for (const child of HTMLElement.children) {
+    const vChild = convertDOMtoVDOM(child);
+    vChildren.push(vChild);
+  }
+  return vChildren;
+}
+
+export function convertStringTemplateToVDOM(template) {
+    var wrapper = document.createElement("div");
+    const finalDiv = document.createElement("div");
+    wrapper.innerHTML = template;
+    for (const child of wrapper.childNodes) {
+        finalDiv.appendChild(child)
+    }
+    return convertDOMtoVDOM(finalDiv);
 }

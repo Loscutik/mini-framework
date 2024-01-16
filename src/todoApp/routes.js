@@ -2,7 +2,7 @@ import createRouter from "../../framework/router.js";
 import { FILTER_ACTIVE, FILTER_ALL, FILTER_COMPLETED } from "./consts.js";
 import { filters } from "./models/filter_model.js";
 
-const routes = [
+export const routes = [
   {
     path: "/completed",
     callback: function () {
@@ -32,6 +32,3 @@ const routes = [
     },
   },
 ];
-
-export const router = createRouter(routes);
-

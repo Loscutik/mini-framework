@@ -1,18 +1,21 @@
-export const mainPageInnerHTML = `<section class="todoapp">
+
+import { convertStringTemplateToVDOM } from "../../../framework/functions.js";
+
+const mainPageTemplate = `<section class="todoapp">
         <header class="header">
             <h1>todos</h1>
             <input class="new-todo" placeholder="What needs to be done?" autofocus>
         </header>
-        <section class="main">
+        <section class="main" id="todo-container">
             <input id="toggle-all" class="toggle-all" type="checkbox">
             <label for="toggle-all">Mark all as complete</label>
-            <ul class="todo-list"></ul>
+            <ul class="todo-list" id="todo-list"></ul>
         </section>
         <footer class="footer">
             <span class="todo-count"></span>
             <ul class="filters">
                 <li>
-                    <a href="#/" onVClick="displayAllTodos" class="selected">All</a>
+                    <a href="#/" class="selected">All</a>
                 </li>
                 <li>
                     <a href="#/active">Active</a>
@@ -30,3 +33,10 @@ export const mainPageInnerHTML = `<section class="todoapp">
         <p>Refactored by <a href="https://github.com/cburgmer">Christoph Burgmer</a></p>
         <p>Part of <a href="http://todomvc.com">TodoMVC</a></p>
     </footer>`;
+
+
+const newVMain = convertStringTemplateToVDOM(mainPageTemplate)
+
+export {newVMain}
+
+

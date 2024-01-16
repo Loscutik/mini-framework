@@ -358,7 +358,7 @@ function prepareChildren(children) {
     let preparedChildren = undefined;
     if (isIterable(children)) {
         preparedChildren = [];
-        for (child of children) {
+        for (const child of children) {
             preparedChildren.push([child.vId, child])
         }
     }
