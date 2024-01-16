@@ -6,7 +6,7 @@ import { diffAttrs, diffChildren } from './functions.js';
 /** virtualElements that represents DOM elements
  *@class VElements creates virtual Elements that represent DOM elements
  * 
- * @property {string} vId -  uuid of the element (read only)
+ * @property {string} vId -  uuid of the element (read only), this vId is set as an argument vid for the corresponding real DOM Element
  * @property {object} state -  objece representing html state
  * @property {string} state.tag -  html tag
  * @property {object} state.attrs -  html attrs
@@ -373,11 +373,10 @@ export class VElement {
      * @param {string} eventType 
      * @returns 
      */
-    emit(eventType, event) {
-        console.log(this._events[eventType]);
-        this._events[eventType].forEach((callback) => {
-            callback(this, event);
-        } );
+    emit(eventType, $event) {
+        console.log("in emit: ", eventType);
+        console.log("in emit: ", this._events[eventType]);
+        this._events[eventType]?.forEach((callback) => callback(this, $event));
         return this;
     }
 }
