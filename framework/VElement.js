@@ -372,8 +372,6 @@ export class VElement {
      * @returns 
      */
     emit(eventType, $event) {
-        console.log("in emit: ", eventType);
-        console.log("in emit: ", this._events[eventType]);
         this._events[eventType]?.forEach((callback) => callback(this, $event));
         return this;
     }

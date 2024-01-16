@@ -39,9 +39,9 @@ const inp = new VElement({
     tag: "input",
     attrs: { id: "inp2", type: "text", class: "cl", },
     '@keydown': (vElem, event) => { vElem.setAttr({ style: "color: blue;" }); 
-    // let text = event.target.value; //
+    let text = event.target.value; //
 
-    // vElem.setAttr({value: text+event.key});
+    vElem.setAttr({value: text+event.key});
     lbl.content="you pressed: " + event.keyCode;}
 });
 App.addVElement(inp).addVElement(lbl);
