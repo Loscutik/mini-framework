@@ -1,5 +1,8 @@
 export default class Filter {
-  filter = "";
+  constructor() {
+    this.filter = "";
+  }
+  
   get getCurrent() {
     return this.filter;
   }

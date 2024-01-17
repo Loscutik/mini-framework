@@ -4,8 +4,6 @@ import { updateActiveCount } from "../templates/main/insideUpperSection/footer_i
 import { vTodoList } from "../templates/main/insideUpperSection/todo_container_items/todoList.js";
 import { filters } from "./filter_model.js";
 
- let completed = false
-
 class TodoElement {
   // modify all of the properties here
   constructor(todo) {
@@ -28,12 +26,12 @@ class TodoElement {
               tag: "input",
               attrs: { type: "checkbox", class: "toggle" },
               "@click": (velem) => {
-                completed = !completed
-                if (completed) {
+                if (this.state == FILTER_ACTIVE) {
                   this.state = FILTER_COMPLETED
                 } else {
                   this.state = FILTER_ACTIVE
                 }
+                updateActiveCount()
               },
             }),
             this.vTodoName, // have the name element here separately to be able to edit the name
@@ -43,6 +41,7 @@ class TodoElement {
               "@click": (velem) => {
                 vTodoList.delChild(this.vTodo._vId);
                 todoList.removeTodo(this.name);
+                updateActiveCount();
                 // function to delete current todo
               },
             }),
@@ -79,9 +78,9 @@ class TodoList {
   newTodo(todo) {
     const todoWithState = {
       name: todo,
-      state: "active"
-    }
-    const vTodoElem = new TodoElement(todoWithState)
+      state: "active",
+    };
+    const vTodoElem = new TodoElement(todoWithState);
     this.todos.push(vTodoElem);
     updateActiveCount();
   }
@@ -89,25 +88,41 @@ class TodoList {
    * @param {string} todo
    */
   removeTodo(todo) {
-    const index = this.todos.map(e => e.name).indexOf(todo);
+    const index = this.todos.map((e) => e.name).indexOf(todo);
     this.todos.splice(index, 1);
   }
   modifyTodo(vElem, newTodo) {
     const index = this.todos.map((e) => e.name).indexOf(oldTodo);
     this.todos[index].vTodoName.content = newTodo;
   }
-  getByFilter() { // main method for displaying the list of todos
+  getByFilter() {
+    // main method for displaying the list of todos
     if (filters.getCurrent == FILTER_ALL) {
-      const todos = this.todos.map(obj => obj.vTodo)
-      return todos
+      const todos = this.todos.map((obj) => obj.vTodo);
+      return todos;
     } else {
-      const result = []
+      const result = [];
       this.todos.forEach((todo, index) => {
         if (todo.currentState == filters.getCurrent) {
           result.push(this.todos[index].vTodo);
         }
-      })
-      return result
+      });
+      return result;
+    }
+  }
+  getByDefinedFilter(filter) {
+    // main method for displaying the list of todos
+    if (filter == FILTER_ALL) {
+      const todos = this.todos.map((obj) => obj.vTodo);
+      return todos;
+    } else {
+      const result = [];
+      this.todos.forEach((todo, index) => {
+        if (todo.currentState == filter) {
+          result.push(this.todos[index].vTodo);
+        }
+      });
+      return result;
     }
   }
 }

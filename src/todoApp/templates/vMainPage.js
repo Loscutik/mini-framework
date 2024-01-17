@@ -4,10 +4,8 @@ import { upperSection } from "./main/upperSectionMain.js";
 
 const mainDiv = new VElement({
   tag: "div",
-  children: [
-    upperSection,
-    footer
-  ],
+  children: [upperSection, footer],
+  
 });
 
 export {mainDiv}

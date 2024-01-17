@@ -1,10 +1,11 @@
 import { VElement } from "../../../../../../framework/VElement.js";
+import { FILTER_ACTIVE } from "../../../../consts.js";
 import { todoList } from "../../../../models/todo_model.js";
 
-let activeCount 
+let activeCount = 0
 export function updateActiveCount() {
-  activeCount = todoList.todos.length;
-  console.log(activeCount)
+  activeCount = todoList.getByDefinedFilter(FILTER_ACTIVE).length
+  todoCount.content = `${activeCount} items left`;
 }
 
 export const todoCount = new VElement({

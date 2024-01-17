@@ -3,6 +3,7 @@ import { router } from "../../../../app.js";
 import { FILTER_COMPLETED } from "../../../../consts.js";
 import { todoList } from "../../../../models/todo_model.js";
 import { vTodoList } from "../todo_container_items/todoList.js";
+import { updateActiveCount } from "./todoCount.js";
 
 export const filtersSection = new VElement({
   tag: "ul",
@@ -63,6 +64,7 @@ export const filtersSection = new VElement({
 });
 
 function clearCompletedTodos() {
+  updateActiveCount()
   todoList.todos = todoList.todos.filter(
     (todo) => todo.state !== FILTER_COMPLETED
   );

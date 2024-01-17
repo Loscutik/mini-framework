@@ -1,6 +1,8 @@
 import { VElement } from "../../../../../../framework/VElement.js";
 import { FILTER_ACTIVE, FILTER_COMPLETED } from "../../../../consts.js";
 import { todoList } from "../../../../models/todo_model.js";
+import { updateActiveCount } from "../footer_items/todoCount.js";
+import { vTodoList } from "./todoList.js";
 
 let allFinished = false
 
@@ -21,5 +23,7 @@ export const vMarkAllComplete = new VElement({
                           todo.state = FILTER_ACTIVE;
                         });
                     }
+                    //vTodoList.children = todoList.getByFilter()
+                    updateActiveCount()
                 }
             })
