@@ -93,10 +93,6 @@ export function diffChildren(oldVChildren, newVChildren) {
         childrenPatches.forEach((patch, vId) => {
             patch($parent.querySelector(`[vId='${vId}']`));
         });
-        console.log('in diffChildren apply putches',  $parent.childNodes)
-        // $parent.childNodes.forEach(($child, i) => {
-        //     childrenPatches[i]($child);
-        // });
 
         for (const patch of additionalPatches) {
             patch($parent);

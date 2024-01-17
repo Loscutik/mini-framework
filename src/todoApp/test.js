@@ -13,6 +13,11 @@ const vUl = new VElement({
     content: "in 7 seconds ul innerHTML will be replaced with a text",
     '@click': (velm) => { velm.setAttr({ style: "color: yellow;" }) },
 });
+const li2 = new VElement({
+    tag: "li",
+    attrs: { ID: "li2", class: "cl" },
+    content: "text2",
+});
 vUl.addChild(
     new VElement({
         tag: "li",
@@ -20,13 +25,8 @@ vUl.addChild(
         content: "text1",
     })
 );
-vUl.addChild(
-    new VElement({
-        tag: "li",
-        attrs: { ID: "li2", class: "cl" },
-        content: "text2",
-    })
-);
+vUl.addChild(li2);
+
 const mim = new VElement({
     tag: "input",
     attrs: { type: "text", class: "cl", value: "change in 4 sec" },
@@ -81,9 +81,11 @@ setTimeout(() => {
     // - Array of Object like for creating
     // - []
     // - wrong - velem, string, ovject
-    //vUl.children = out.state.children
-    vUl.children = [new VElement({ tag: 'li', attrs: { ID: 'lin1' }, content: 'set: new element1' }),
-    new VElement({ tag: 'li', attrs: { ID: 'lin2' }, content: 'set: new element2' }),]
+    vUl.delChild(li2.vId)
+    // vUl.children = out.state.children
+    // vUl.children = [{ tag: 'li', attrs: { ID: 'lin1' }, content: 'set: new element1' },
+    // { tag: 'li', attrs: { ID: 'lin2' }, content: 'set: new element2' },]
+
     console.log("test children setter: vUl:", vUl)
 
     out.addChild(new VElement({ tag: 'p', content: `tag changed input -> h3 (tag: ${mim.tag})` }));

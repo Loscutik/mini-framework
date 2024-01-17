@@ -121,9 +121,7 @@ export class VElement {
                     // works if we assign a Map or undefined as children
                     if (key === 'children') {
                         const oldChildren = stateObj.children;
-                        console.log('in setter for children0' , value);
                         if (value == null || (value instanceof Map && stateObj.tag)) {
-                            console.log('in setter for children' , value);
                             stateObj.children = value;
                             if (this.$elem instanceof Element) {
                                 const patch = diffChildren(oldChildren, stateObj.children);
@@ -133,7 +131,7 @@ export class VElement {
 
                     }
                     return stateObj[key]
-                }
+                },
             }
         );
 
@@ -354,7 +352,13 @@ export class VElement {
      * @returns 
      */
     delChild(vId) {
+        const oldElm = this.getChild(vId);
         this.state.children.delete(vId);
+        if (oldElm.$elem instanceof Element) {
+            oldElm.$elem.remove();
+        }
+
+
         return this;
     }
 
@@ -363,6 +367,7 @@ export class VElement {
      * @param {string} key - name of the attribute
      * @returns
      */
+    //TODO
     delAttr(key) {
         this.state.attrs.delete(key);
         return this;
