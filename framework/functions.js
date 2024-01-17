@@ -1,15 +1,10 @@
-// on event
 
-// import { vApp } from "../app"; //  we must not use app in framwork, but use framework in app (like vue doesn't know about our app)
 import { VElement } from "./VElement.js";
 import render from "./render.js"
 
 // compare the old vApp to the new vApp
 
-// then replace the old vApp with the new vApp
-
-//? then mount somehow only the items that have changed? so we can't use vApp.mount()
-
+// then replace the old vApp with the new vApp and apply changes to the real DOM
 
 /**
  * 
