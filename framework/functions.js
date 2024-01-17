@@ -74,8 +74,6 @@ export function diffChildren(oldVChildren, newVChildren) {
         });
     } else { // oldVChildren also != null
         oldVChildren.forEach((oldVChild, vId) => {
-            console.log('in diffChildren', vId, oldVChild)
-            console.log('in diffChildren vid in new', newVChildren.get(vId));
             childrenPatches.set(vId, diff(oldVChild, newVChildren.get(vId)));
         });
 

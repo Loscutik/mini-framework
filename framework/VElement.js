@@ -35,7 +35,7 @@ export class VElement {
      *   children - array of VElements
      *   content - the text to be inserted into the DOM Element
      *   parameters with name starting with `@` and  a function as the value - those will be considered as events, their values as handlers, 
-     *   for exaample '@click': (velm) => { velm.setAttr({ style: "color: green;" })}
+     *   for example '@click': (velm) => { velm.setAttr({ style: "color: green;" })}
      * Events 'name (if there is any) must start with `@` 
      *@constructor
      *
@@ -81,8 +81,6 @@ export class VElement {
                  * 
                  */
                 set: (stateObj, key, value) => {
-                    // console.log(`in VElement.state Proxy setter: params are: `, stateObj, key, value);
-
                     if (value === undefined ||
                         value === null ||
                         key === undefined ||
@@ -214,7 +212,6 @@ export class VElement {
      * @returns 
      */
     getChild(vId) {
-        // console.log("getChild search for vId: " + vId + " in state: ", this.state);
         const children = this.state.children
         let searchChild
         if (children) {
@@ -250,14 +247,13 @@ export class VElement {
         }
 
         if (this.state.content !== undefined && this.state.content !== '') {
-            // console.log(`render: content is ${this.state.content}`);
             $elem.innerHTML = this.state.content;
         }
 
         if (this.state.children) {
           this.state.children.forEach((child) => {
             $elem.appendChild(child.render().$elem);
-          }); //console.log(`render: child - `, child);
+          }); 
         }
 
         this.$elem.setAttribute('vId', this.vId);
@@ -271,7 +267,6 @@ export class VElement {
      */
 
     mount($elem) {
-        console.log(`mounting to $elem: `, $elem);
         $elem.replaceWith(this.render().$elem);
         return this;
     }
@@ -324,7 +319,6 @@ export class VElement {
         }
 
         if (vNode instanceof VElement) {
-            console.log('Adding child:  state.children  ', this.state.children)
             this.state.children.set(vNode.vId, vNode);
             if (this.$elem instanceof Element) {
                 const $node = vNode.render().$elem
@@ -341,7 +335,6 @@ export class VElement {
      * @returns 
      */
     createElement(obj = { tag: "div", attrs: {}, content: "", children: [] }) {
-        console.log("in createElement, obj: ", obj);
         const vElem = new VElement(obj);
         this.addChild(vElem);
 
