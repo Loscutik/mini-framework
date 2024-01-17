@@ -49,6 +49,7 @@ export class VElement {
     constructor(vElemObj = { tag: "div", attrs: {}, content: "", children: [] }) {
         this._vId = crypto.randomUUID();
 
+        // for non string elements attributes and children are not null to prevent checking them in all methods and functions 
         if (typeof vElemObj === "object") {
             if (vElemObj.attrs == null) {
                 vElemObj.attrs = {};
@@ -117,29 +118,27 @@ export class VElement {
                         }
                     }
 
-                    // works if we assighn a new array as children
+                    // works if we assign a Map or undefined as children
                     if (key === 'children') {
                         const oldChildren = stateObj.children;
-                        const preparedChildren = prepareChildren(value)
-                        stateObj.children = new Map(preparedChildren);
-                        if (this.$elem instanceof Element) {
-                            const patch = diffChildren(oldChildren, stateObj.children);
-                            this.$elem = patch(this.$elem);
+                        if (value == null || (value instanceof Map && stateObj.tag)) {
+                            stateObj.children = value;
+                            if (this.$elem instanceof Element) {
+                                const patch = diffChildren(oldChildren, stateObj.children);
+                                this.$elem = patch(this.$elem);
+                            }
                         }
-                    }
 
+                    }
                     return stateObj[key]
-                }
+                },
             }
         );
-
-        console.log(`this: `, this)
-
 
         this._events = new Proxy({},
             {
                 set: (target, eventType, callback) => {
-                    if (!eventType.startsWith("@")) {
+                    if (!eventType.startsWith("@") || !(typeof callback === 'function')) {
                         throw new Error("events set error: wrong event type: " + eventType)
                     }
                     if (!target[eventType]) {
@@ -152,8 +151,12 @@ export class VElement {
             });
 
         for (const prop in vElemObj) {
-            if (prop.startsWith('@') && typeof vElemObj[prop] === 'function') {
-                this._events[prop] = vElemObj[prop];
+            if (prop.startsWith('@')) {
+                try {
+                    this._events[prop] = vElemObj[prop];
+                } catch (e) {
+                    console.error("cant add listener for event " + prop + ", err " + e)
+                }
             }
         }
     }
@@ -173,7 +176,7 @@ export class VElement {
     }
     get children() {
         if (this.state.children == null) return this.state.children;
-        return this.state.children.entries(); // remember the children property is Map
+        return this.state.children.values(); // remember the children property is Map
     }
     get events() {
         return Object.entries(this._events)
@@ -189,7 +192,20 @@ export class VElement {
         return this.state.content = value;
     }
     set children(value) {
-        return this.state.children = value;
+        switch (true) {
+            case value instanceof Array:
+                const preparedChildren = prepareChildren(value)
+                this.state.children = new Map(preparedChildren);
+                break;
+            case value instanceof Map:
+                this.state.children = value;
+                break;
+            default:
+                console.error("can't assign the children property other than Array or Map");
+                break;
+        }
+
+        return this.state.children;
     }
 
     /** get child by its vId
@@ -338,7 +354,13 @@ export class VElement {
      * @returns 
      */
     delChild(vId) {
+        const oldElm = this.getChild(vId);
         this.state.children.delete(vId);
+        if (oldElm.$elem instanceof Element) {
+            oldElm.$elem.remove();
+        }
+
+
         return this;
     }
 
@@ -347,6 +369,7 @@ export class VElement {
      * @param {string} key - name of the attribute
      * @returns
      */
+    //TODO
     delAttr(key) {
         this.state.attrs.delete(key);
         return this;
@@ -374,8 +397,6 @@ export class VElement {
      * @returns 
      */
     emit(eventType, $event) {
-        console.log("in emit: ", eventType);
-        console.log("in emit: ", this._events[eventType]);
         this._events[eventType]?.forEach((callback) => callback(this, $event));
         return this;
     }
@@ -391,7 +412,12 @@ function prepareChildren(children) {
     if (isIterable(children)) {
         preparedChildren = [];
         for (const child of children) {
-            preparedChildren.push([child.vId, child])
+            if (child instanceof VElement) {
+                preparedChildren.push([child.vId, child]);
+            } else {
+                const newElm = new VElement(child);
+                preparedChildren.push([newElm.vId, newElm]);
+            }
         }
     }
     return preparedChildren;
