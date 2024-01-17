@@ -1,5 +1,8 @@
 import { VElement } from "../../../../../../framework/VElement.js"
 import { router } from "../../../../app.js";
+import { FILTER_COMPLETED } from "../../../../consts.js";
+import { todoList } from "../../../../models/todo_model.js";
+import { vTodoList } from "./todoList.js";
 
 export const filtersSection = new VElement({
   tag: "ul",
@@ -17,9 +20,6 @@ export const filtersSection = new VElement({
             href: "#/",
           },
           content: "All",
-          "@click": (velm) => {
-            router.routeTo("#/");
-          },
         }),
       ],
     }),
@@ -33,9 +33,6 @@ export const filtersSection = new VElement({
             href: "#/active",
           },
           content: "Active",
-          "@click": (velm) => {
-            router.routeTo("#/active");
-          },
         }),
       ],
     }),
@@ -49,9 +46,6 @@ export const filtersSection = new VElement({
             href: "#/completed",
           },
           content: "Completed",
-          "@click": (velm) => {
-            router.routeTo("#/completed");
-          },
         }),
       ],
     }),
@@ -61,6 +55,16 @@ export const filtersSection = new VElement({
         class: "clear-completed",
       },
       content: "Clear completed",
+      '@click': (velm) => {
+        clearCompletedTodos()
+      }
     }),
   ],
 });
+
+function clearCompletedTodos() {
+  todoList.todos = todoList.todos.filter(
+    (todo) => todo.state !== FILTER_COMPLETED
+  );
+  vTodoList.children = todoList.getByFilter();
+}

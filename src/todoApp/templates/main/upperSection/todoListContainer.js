@@ -2,6 +2,11 @@ import { VElement } from "../../../../../framework/VElement.js";
 import { vTodoList } from "./todo_container_items/todoList.js";
 import { filtersSection } from "./todo_container_items/filters.js";
 import { todoInput } from "./todo_container_items/todoInput.js";
+import { todoList } from "../../../models/todo_model.js";
+import { FILTER_ACTIVE, FILTER_COMPLETED } from "../../../consts.js";
+import { vMarkAllComplete } from "./todo_container_items/markAllComplete.js";
+
+let allFinished = false
 
 export const insideUpperSection = [
     todoInput,
@@ -18,13 +23,7 @@ export const insideUpperSection = [
                 id: "toggle-all",
                 },
             }),
-            new VElement({
-                tag: "label",
-                attrs: {
-                for: "toggle-all",
-                },
-                content: "Mark all as complete",
-            }),
+            vMarkAllComplete,
             vTodoList,
         ],
     }),
