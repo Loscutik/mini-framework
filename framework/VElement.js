@@ -367,9 +367,12 @@ export class VElement {
      * @param {string} key - name of the attribute
      * @returns
      */
-    //TODO
+    //TODO test
     delAttr(key) {
         this.state.attrs.delete(key);
+        if (this.$elem){
+            this.$elem.removeAttribute(key);
+        }
         return this;
     }
 
