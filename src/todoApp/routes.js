@@ -2,7 +2,7 @@ import createRouter from "../../framework/router.js";
 import { FILTER_ACTIVE, FILTER_ALL, FILTER_COMPLETED } from "./consts.js";
 import { filters } from "./models/filter_model.js";
 import { todoList } from "./models/todo_model.js";
-import { vTodoList } from "./templates/main/upperSection/todo_container_items/todoList.js";
+import { vTodoList } from "./templates/main/insideUpperSection/todo_container_items/todoList.js";
 
 export const routes = [
   {

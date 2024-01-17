@@ -1,12 +1,9 @@
 import { VElement } from "../../../../../framework/VElement.js";
 import { vTodoList } from "./todo_container_items/todoList.js";
-import { filtersSection } from "./todo_container_items/filters.js";
 import { todoInput } from "./todo_container_items/todoInput.js";
-import { todoList } from "../../../models/todo_model.js";
-import { FILTER_ACTIVE, FILTER_COMPLETED } from "../../../consts.js";
 import { vMarkAllComplete } from "./todo_container_items/markAllComplete.js";
+import { upperSectionFooter } from "./upperSectionFooter.js";
 
-let allFinished = false
 
 export const insideUpperSection = [
     todoInput,
@@ -27,17 +24,6 @@ export const insideUpperSection = [
             vTodoList,
         ],
     }),
-    new VElement({
-        tag: "footer",
-        attrs: { class: "footer" },
-        children: [
-            new VElement({
-                tag: "span",
-                attrs: {
-                class: "todo-count",
-                },
-            }),
-            filtersSection
-        ],
-    }),
-    ]
+    // have this conditionally rendered when there is more than 1 todo
+    upperSectionFooter
+]

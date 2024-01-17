@@ -1,6 +1,7 @@
 import { VElement } from "../../../framework/VElement.js";
 import { FILTER_ACTIVE, FILTER_ALL, FILTER_COMPLETED } from "../consts.js";
-import { vTodoList } from "../templates/main/upperSection/todo_container_items/todoList.js";
+import { updateActiveCount } from "../templates/main/insideUpperSection/footer_items/todoCount.js";
+import { vTodoList } from "../templates/main/insideUpperSection/todo_container_items/todoList.js";
 import { filters } from "./filter_model.js";
 
  let completed = false
@@ -51,8 +52,10 @@ class TodoElement {
     });
   }
   set state(state) {
+    
     this.currentState = state;
     this.vTodo.setAttr({ state: state, class: state });
+    
   }
   get state() {
     return this.currentState;
@@ -80,6 +83,7 @@ class TodoList {
     }
     const vTodoElem = new TodoElement(todoWithState)
     this.todos.push(vTodoElem);
+    updateActiveCount();
   }
   /**
    * @param {string} todo
