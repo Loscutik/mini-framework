@@ -1,18 +1,22 @@
 import { VElement } from "../../../../../../framework/VElement.js"
-import { parseKeyInput } from "../../../helpers/keyEventHandler.js"
-import { addTodo, vTodoList } from "./todoList.js"
+import { createNewTodo, todoList } from "../../../../models/todo_model.js"
+import { vTodoList } from "./todoList.js"
 
 
 let input = ""
 // add the input to vTodoList
-
 function updateValue(velm, event) {
-    if (event.key == "Enter") {
-        vTodoList.addChild(addTodo(input))
+    input = event.target.value
+    console.log(event.target.value);
+    if (event.key == "Enter" && input != "") {
+        todoList.newTodo(input)
+        /* const newTodo = createNewTodo(input)
+        let count = 0
+        vTodoList.addChild(newTodo) */
+        vTodoList.children = todoList.todos
         input = ""
-    } else {
-        input = parseKeyInput(event.key, input);
     }
+    console.log(vTodoList.state.children.size);
     velm.setAttr({ value: input });
 }
 
@@ -28,10 +32,9 @@ export const todoInput = new VElement({
     attrs: {
         class: "new-todo",
         placeholder:"What needs to be done?",
-        value: "",
+        value: input
     },
     '@keydown': (velm, event) => {
-        // change value of input
         updateValue(velm, event)
     }
     })],

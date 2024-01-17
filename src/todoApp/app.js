@@ -16,9 +16,3 @@ App.mount(document.getElementById('app'))
 
 App.addVElement(mainDiv);
 
-// add todo list
-
-/* App.addVElement(newVMain);
-const todoContainer = App.getVElementByID("todo-container");
-todoContainer.addChild(vTodoList); */
-
