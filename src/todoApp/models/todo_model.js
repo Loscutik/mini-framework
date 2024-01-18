@@ -1,18 +1,25 @@
 import { VElement } from "../../../framework/VElement.js";
 import { FILTER_ACTIVE, FILTER_ALL, FILTER_COMPLETED } from "../consts.js";
 import { updateActiveCount } from "../templates/main/insideUpperSection/footer_items/todoCount.js";
+import { createModifyTodoBox } from "../templates/main/insideUpperSection/todo_container_items/modifyTodoBox.js";
 import { vTodoList } from "../templates/main/insideUpperSection/todo_container_items/todoList.js";
 import { filters } from "./filter_model.js";
 
-class TodoElement {
+ 
+
+
+export class TodoElement {
   // modify all of the properties here
   constructor(todo) {
     this.currentState = todo.state;
-
     this.name = todo.name;
     this.vTodoName = new VElement({
       tag: "label",
       content: this.currName,
+      '@dblclick': (velem, event) => {
+        this.state = "editing"
+        this.vTodo.addChild(createModifyTodoBox(this.currName, this));
+      }
     });
     this.vTodo = new VElement({
       tag: "li",
@@ -31,7 +38,7 @@ class TodoElement {
                 } else {
                   this.state = FILTER_ACTIVE
                 }
-                updateActiveCount()
+                vTodoList.children = todoList.getByFilter();
               },
             }),
             this.vTodoName, // have the name element here separately to be able to edit the name
@@ -42,6 +49,7 @@ class TodoElement {
                 vTodoList.delChild(this.vTodo._vId);
                 todoList.removeTodo(this.name);
                 updateActiveCount();
+                //updateFooterActiveCount()
                 // function to delete current todo
               },
             }),
@@ -49,6 +57,12 @@ class TodoElement {
         }),
       ],
     });
+    
+  }
+  set todoName(vEditer) {
+    this.vTodo.delChild(this.vTodo._vId);
+    
+    //this.vTodoName = vEditer
   }
   set state(state) {
     
@@ -64,7 +78,7 @@ class TodoElement {
   }
   set currName(name) {
     this.name = name;
-    this.vTodoName = name
+    this.vTodoName.content = name
   }
 }
 
@@ -82,7 +96,7 @@ class TodoList {
     };
     const vTodoElem = new TodoElement(todoWithState);
     this.todos.push(vTodoElem);
-    updateActiveCount();
+    //updateActiveCount();
   }
   /**
    * @param {string} todo
@@ -107,6 +121,7 @@ class TodoList {
           result.push(this.todos[index].vTodo);
         }
       });
+      updateActiveCount();
       return result;
     }
   }

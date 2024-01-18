@@ -1,7 +1,8 @@
 // TODO test if  setter for children works
 // TODO test chained call using vElem.addChild(vElm1).setAttre({myAttr: 'test'})....
 
-import { diffAttrs, diffChildren } from './functions.js';
+import { diffAttrs, diffChildren, updateReactives } from './functions.js';
+import { throttleFunction } from './helpers.js';
 
 /** virtualElements that represents DOM elements
  *@class VElements creates virtual Elements that represent DOM elements
@@ -75,6 +76,8 @@ export class VElement {
             },
             {
                 get: (stateObj, key) => {
+                    throttleFunction(updateReactives(), 1000)
+                    
                     return stateObj[key]
                 },
                 /** allows to set properties tag, arggs, content, children. Any other will be ignored. value for children property is VElement[], which will be converted to Map
@@ -82,7 +85,6 @@ export class VElement {
                  */
                 set: (stateObj, key, value) => {
                     // console.log(`in VElement.state Proxy setter: params are: `, stateObj, key, value);
-
                     if (value === undefined ||
                         value === null ||
                         key === undefined ||
@@ -91,6 +93,7 @@ export class VElement {
                     }
 
                     if (key === 'tag') {
+                        
                         stateObj.tag = value;
                         if (this.$elem instanceof Element) {
                             const $oldElm = this.$elem //neeed to keep the old $elem because after render (in the next row) it will be renewed
@@ -120,6 +123,7 @@ export class VElement {
 
                     // works if we assign a Map or undefined as children
                     if (key === 'children') {
+                        
                         const oldChildren = stateObj.children;
                         if (value == null || (value instanceof Map && stateObj.tag)) {
                             stateObj.children = value;
@@ -130,6 +134,7 @@ export class VElement {
                         }
 
                     }
+                    
                     return stateObj[key]
                 },
             }
@@ -207,6 +212,13 @@ export class VElement {
 
         return this.state.children;
     }
+    /**
+     * 
+     * @param {VElement} newVElem 
+     */
+    replaceElement(newVElem) {
+        this.$elem = newVElem
+    }
 
     /** get child by its vId
      * 
@@ -234,8 +246,7 @@ export class VElement {
      * @returns  
      */
     render() {
-        // console.log(`start render: `, this);
-
+        //console.log(`start render: `, this);
         if (this.state.tag == null || this.state.tag == '') {
             const $elem = document.createTextNode(this.state.content);
             this.$elem = $elem;

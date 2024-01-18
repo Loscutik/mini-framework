@@ -7,14 +7,12 @@ let input = ""
 // add the input to vTodoList
 function updateValue(velm, event) {
     input = event.target.value
-    console.log(event.target.value);
     if (event.key == "Enter" && input != "") {
         submitTodo(input)
         input = "";
         velm.setAttr({ value: input });
         event.target.value = ""
     }
-    console.log(velm.state)
     //velm.setAttr({ value: input });
 }
 

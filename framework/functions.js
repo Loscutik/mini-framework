@@ -10,6 +10,13 @@ import render from "./render.js"
 
 //? then mount somehow only the items that have changed? so we can't use vApp.mount()
 
+export const reactives = []
+
+export function updateReactives() {
+    reactives.forEach(reactive => {
+        reactive()
+    })
+}
 
 /**
  * 
@@ -106,6 +113,8 @@ export function diffChildren(oldVChildren, newVChildren) {
  * @param {VElement} vNewNode 
  */
 function diff(vOldNode, vNewNode) {
+    // launch the callback for reactive values
+    
     if (vNewNode === undefined) {
         return $n => {
             $n.remove();

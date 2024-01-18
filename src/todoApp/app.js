@@ -5,12 +5,16 @@ import { vTodoList } from './templates/main/insideUpperSection/todo_container_it
 import { routes } from './routes.js';
 import { newVMain} from './templates/mainPage_old.js';
 import { mainDiv } from './templates/vMainPage.js';
+import { reactives } from '../../framework/functions.js';
+import { updateReactiveValues } from './helpers/updateReactiveValues.js';
 
 
 export const router = createRouter(routes);
 export const App = new Frame()
 
-App.useEvents("click", "keydown")
+App.useEvents("click", "keydown", "dblclick")
+
+reactives.push(updateReactiveValues)
 
 App.mount(document.getElementById('app'))
 

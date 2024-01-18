@@ -11,6 +11,7 @@ export default function render(vNode) {
     }
 
     if (vNode instanceof VElement) {
+        
         return vNode.render();
     }
 
