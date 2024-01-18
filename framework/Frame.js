@@ -1,6 +1,3 @@
-// TODO test if getter and setter work (vElm.children = [vElem1, vElem2], ch = vElm.children)
-
-
 import { VElement } from "./VElement.js";
 
 /** creates virtual Application instance
@@ -98,7 +95,8 @@ export class Frame {
    * @returns {Element}
    */
   render() {
-    return this._state.render().$elem; //TODO return this instead and create a property $elem
+    this._state.render().$elem;
+    return this; 
   }
 
   /**return (corresponding virtual Element) as object - TODO ? useless?
@@ -119,7 +117,7 @@ export class Frame {
     this._DOMeventsListener($elem);
     return $elem;
   }
-
+//TODO useless? 
   getVElementByID(id, scope) {
     if (!scope) {
       scope = this;
