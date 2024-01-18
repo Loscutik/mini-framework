@@ -173,3 +173,5 @@ Then in your router, you add the routes array into `createRouter()` function:
 
 You can use this router variable to go to routes and set parameters in one method call.
 
+`router.routeTo("#hello", "world")`
+
