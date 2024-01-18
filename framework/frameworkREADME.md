@@ -38,10 +38,10 @@ These VElements and their children nesting will define the structure of your pag
 const newVElement = new VElement({
     tag: "div",
     attrs: {class: "hello"},
-    content: "Hello world",
+    content: "Hello world", // InnerHTML of this element
     children: [VElementChild, AnotherVElementChild]
 })
-</code>
+```
 
 An example by importing components from other files: 
 
@@ -57,7 +57,7 @@ const section = new VElement({
     AnotherVElementChild,
   ],
 });
-</code>
+```
 
 To add or remove elements conditionally, you can use `VElement.addChild(newVElement)`, where `newVElement` is another VElement. For example:
 
