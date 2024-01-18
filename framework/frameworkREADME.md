@@ -62,25 +62,21 @@ const section = new VElement({
 To add or remove elements conditionally, you can use `VElement.addChild(newVElement)`, where `newVElement` is another VElement. For example:
 
 ```
-let added = false;
-
 function addVElement() {
-  const condition = someValue;
-  if (condition && !added) {
-    added = true
-    VElement.addChild(newVElement); 
-  } else if (activeCount == 0 && added) {
-    added = false
-    upperSection.delChild(upperSectionFooter._vId)
+  condition = someCondition;
+  if (condition) {
+    myVElement.addChild(newVElement); 
+  } else if (!condition) {
+    myVElement.delChild(newVElement._vId)
   }
 }
 
-const upperSection = new VElement({
+const myVElement = new VElement({
   tag: "section",
   attrs: { class: "todoapp" },
   children: [
-    todoInput,
-    mainTodoTextContainer,
+    VElementChild, 
+    AnotherVElementChild,
   ],
 });
 ```
