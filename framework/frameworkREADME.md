@@ -21,23 +21,23 @@ Quick copy-paste to create new vElement attributes:  {tag: "div", attrs: {}, con
 
 # TUTORIAL
 
-== TEMPLATES ==
+## TEMPLATES
 
 The main structure for your project should be in a `templates` folder. In this folder you will have templates that contain VElements and their children.
 These VElements and their children nesting will define the structure of your page. To define a VElement, you will use the following structure:
 
-<code>
+```
 const newVElement = new VElement({
     tag: "div",
     attrs: {class: "hello"},
     content: "Hello world",
     children: [VElementChild, AnotherVElementChild]
 })
-<code>
+</code>
 
 An example by importing components from other files: 
 
-<code>
+```
 import { VElementChild } from "./module.js";
 import { AnotherVElementChild } from "./module.js";
 
@@ -49,11 +49,11 @@ const section = new VElement({
     AnotherVElementChild,
   ],
 });
-<code>
+</code>
 
 To add or remove elements conditionally, you can use `VElement.addChild(newVElement)`, where `newVElement` is another VElement. For example:
 
-<code>
+```
 let added = false;
 
 function addVElement() {
@@ -75,9 +75,9 @@ const upperSection = new VElement({
     mainTodoTextContainer,
   ],
 });
-<code>
+```
 
-== EVENTS ==
+## EVENTS
 
 To define which events the framework can use, you add them in your App variable:
 
@@ -88,7 +88,7 @@ To use these events in your components, simply add an attribute to a VElement wi
 
 Example:
 
-<code>
+```
 
 const newVElement = new VElement({
     tag: "div",
@@ -102,9 +102,9 @@ const newVElement = new VElement({
     }
 })
 
-<code>
+```
 
-== UPDATING DOM IN REAL TIME ==
+## UPDATING DOM IN REAL TIME
 
 Most operations that you do with VElements will affect the DOM as you modify them, for examle:
 
@@ -112,7 +112,7 @@ Most operations that you do with VElements will affect the DOM as you modify the
 
 Some available operations:
 
-<code>
+```
 vElem.setAttr({ ID: 'li1', class: 'cl' }) //add/replace velement's attributes
 vElem.delAttribute(attrName) //remove attribute
 vElem.addChild(newVElem or string) //add new child to vElem
@@ -121,10 +121,10 @@ vElem.delChild(vId) //remove child from vElem, vId=chilToDelete.vId
 // v.Elem.$elem - corresponding real Element
 vElem.on(eventType, callback)  // add listener (callback) to an event, eventType is a string starting with @ (@click, @myEvent)
 vElem.emit(eventType) // fire your own event(or not yours - @click - immitate click) - vElem.emit(@myEvent) - will call the callback addded with on method
-<code>
+```
 
 
-== ROUTER ==
+## ROUTER
 
 # To add paths to the routes, define them as objects inside an array. Each object should have a 'path' attribute and a callback/handler, ex:
 
