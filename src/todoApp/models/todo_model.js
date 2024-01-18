@@ -18,12 +18,12 @@ export class TodoElement {
       content: this.currName,
       '@dblclick': (velem, event) => {
         this.state = "editing"
-        this.vTodo.addChild(createModifyTodoBox(this.currName, this));
+        this.vTodo.addChild(createModifyTodoBox(this.currName, this)); // add the input box for editing
       }
     });
     this.vTodo = new VElement({
       tag: "li",
-      attrs: { class: this.state, state: this.state }, // class: "todo"
+      attrs: { class: this.state, state: this.state },
       children: [
         new VElement({
           tag: "div",
@@ -59,16 +59,9 @@ export class TodoElement {
     });
     
   }
-  set todoName(vEditer) {
-    this.vTodo.delChild(this.vTodo._vId);
-    
-    //this.vTodoName = vEditer
-  }
   set state(state) {
-    
     this.currentState = state;
     this.vTodo.setAttr({ state: state, class: state });
-    
   }
   get state() {
     return this.currentState;
