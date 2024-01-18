@@ -11,4 +11,4 @@ Or install Live Server extension into VSCode and launch it with that.
 Framework Readme is in `./framework/frameworkREADME.md`.
 
 
-Created by: Hems_Chrisworth, locustik (olena), lauri99 (anubis), Mustkass
+Created by: Hems_Chrisworth, lauri99 (anubis)
