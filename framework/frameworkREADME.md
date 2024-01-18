@@ -141,8 +141,9 @@ vElem.emit(eventType) // fire your own event(or not yours - @click - immitate cl
 
 ## ROUTER
 
-# To add paths to the routes, define them as objects inside an array. Each object should have a 'path' attribute and a callback/handler, ex:
+To add paths to the routes, define them as objects inside an array. Each object should have a 'path' attribute and a callback/handler, ex:
 
+```
 const routes = [
     {
         path: "hello",
@@ -163,6 +164,7 @@ const routes = [
         }
     },
 ]
+```
 
 You are free to do in the callbacks whatever you need.
 Then in your router, you add the routes array into `createRouter()` function:
