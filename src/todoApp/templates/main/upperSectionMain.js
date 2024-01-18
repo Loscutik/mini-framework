@@ -35,6 +35,5 @@ export const upperSection = new VElement({
   children: [
     todoInput,
     mainTodoTextContainer,
-    // have this conditionally rendered when there is more than 1 todo
   ],
 });

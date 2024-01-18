@@ -10,14 +10,7 @@ const newVElmLi = new VElement({ tag: 'li', attrs: { ID: 'li1', class: 'cl' } })
 const newVElmU = new VElement({ tag: 'ul', attrs: { ID: 'list', class: 'cl' }, children: [newVElmLi]})
 App.ddVElement(newVElmU)  // add new elements to App,it must change real DOM
 
-vElem.setAttr({ ID: 'li1', class: 'cl' }) //add/replace velement's attributes
-vElem.delAttribute(attrName) //remove attribute
-vElem.addChild(newVElem or string) //add new child to vElem
-vElem.delChild(vId) //remove child from vElem, vId=chilToDelete.vId
-// each vElem has its own vId and it is set as vId attribute in the corresponding real Element
-// v.Elem.$elem - corresponding real Element
-vElem.on(eventType, callback)  // add listener (callback) to an event, eventType is a string starting with @ (@click, @myEvent)
-vElem.emit(eventType) // fire your own event(or not yours - @click - immitate click) - vElem.emit(@myEvent) - will call the callback addded with on method
+
 
 # V
 
@@ -26,10 +19,114 @@ This is to not confuse the actual HTML DOM elements and their object representat
 
 Quick copy-paste to create new vElement attributes:  {tag: "div", attrs: {}, content: "", children: []}
 
+# TUTORIAL
+
+== TEMPLATES ==
+
+The main structure for your project should be in a `templates` folder. In this folder you will have templates that contain VElements and their children.
+These VElements and their children nesting will define the structure of your page. To define a VElement, you will use the following structure:
+
+<code>
+const newVElement = new VElement({
+    tag: "div",
+    attrs: {class: "hello"},
+    content: "Hello world",
+    children: [VElementChild, AnotherVElementChild]
+})
+<code>
+
+An example by importing components from other files: 
+
+<code>
+import { VElementChild } from "./module.js";
+import { AnotherVElementChild } from "./module.js";
+
+const section = new VElement({
+  tag: "section",
+  attrs: { class: "container" },
+  children: [   // VElements that are defined in other .js files
+    VElementChild, 
+    AnotherVElementChild,
+  ],
+});
+<code>
+
+To add or remove elements conditionally, you can use `VElement.addChild(newVElement)`, where `newVElement` is another VElement. For example:
+
+<code>
+let added = false;
+
+function addVElement() {
+  const condition = someValue;
+  if (condition && !added) {
+    added = true
+    VElement.addChild(newVElement); 
+  } else if (activeCount == 0 && added) {
+    added = false
+    upperSection.delChild(upperSectionFooter._vId)
+  }
+}
+
+const upperSection = new VElement({
+  tag: "section",
+  attrs: { class: "todoapp" },
+  children: [
+    todoInput,
+    mainTodoTextContainer,
+  ],
+});
+<code>
+
+== EVENTS ==
+
+To define which events the framework can use, you add them in your App variable:
+
+`App.useEvents("click", "keydown", "dblclick")`
+
+To use these events in your components, simply add an attribute to a VElement with a callback function to them like this:
+`@click: (velem, event) => { console.log("hello") }`
+
+Example:
+
+<code>
+
+const newVElement = new VElement({
+    tag: "div",
+    attrs: {class: "hello"},
+    content: "Hello world",
+    children: [VElementChild, AnotherVElementChild]
+    '@click': (velem, event) => {
+        velem.content = "Hello again world"
+        // or 
+        newVElem.content = "Hello again world"
+    }
+})
+
+<code>
+
+== UPDATING DOM IN REAL TIME ==
+
+Most operations that you do with VElements will affect the DOM as you modify them, for examle:
+
+`VElement.setAttrs({class: "world"})` will change the class of that corresponding HTMLElement to `world`.
+
+Some available operations:
+
+<code>
+vElem.setAttr({ ID: 'li1', class: 'cl' }) //add/replace velement's attributes
+vElem.delAttribute(attrName) //remove attribute
+vElem.addChild(newVElem or string) //add new child to vElem
+vElem.delChild(vId) //remove child from vElem, vId=chilToDelete.vId
+// each vElem has its own vId and it is set as vId attribute in the corresponding real Element
+// v.Elem.$elem - corresponding real Element
+vElem.on(eventType, callback)  // add listener (callback) to an event, eventType is a string starting with @ (@click, @myEvent)
+vElem.emit(eventType) // fire your own event(or not yours - @click - immitate click) - vElem.emit(@myEvent) - will call the callback addded with on method
+<code>
 
 
+== ROUTER ==
 
-# To add paths to the routes, define them as objects inside an array. Each object should have a 'path' attribute and a callback, ex:
+# To add paths to the routes, define them as objects inside an array. Each object should have a 'path' attribute and a callback/handler, ex:
 
 const routes = [
     {
@@ -51,3 +148,11 @@ const routes = [
         }
     },
 ]
+
+You are free to do in the callbacks whatever you need.
+Then in your router, you add the routes array into `createRouter()` function:
+
+`const router = createRouter(routes);`
+
+You can use this router variable to go to routes and set parameters in one method call.
+
