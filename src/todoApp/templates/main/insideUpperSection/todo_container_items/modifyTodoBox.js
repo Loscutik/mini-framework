@@ -15,7 +15,6 @@ export function createModifyTodoBox(oldTodo, todoElementClass) {
       attrs: { value: oldTodo, class: "edit" },
       "@keydown": (velem, event) => {
         if (event.key == "Enter") {
-            console.log(event.target.value)
             todoElementClass.state = "active"
             todoElementClass.currName = event.target.value;
             console.log(todoElementClass.currName)
